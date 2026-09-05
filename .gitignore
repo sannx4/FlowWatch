@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Local data
+data/raw/*
+data/staging/*
+data/rejected/*
+
+# Keep directory structure
+!data/raw/.gitkeep
+!data/staging/.gitkeep
+!data/rejected/.gitkeep
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build
+build/
+dist/
+*.egg-info/
