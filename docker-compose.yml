@@ -2,7 +2,6 @@ services:
   postgres:
     image: postgres:17
     container_name: flowwatch-postgres
-
     restart: unless-stopped
 
     environment:
@@ -30,9 +29,42 @@ services:
     networks:
       - flowwatch_core
 
+  mongo:
+    image: mongo:8.0
+    container_name: flowwatch-mongo
+    restart: unless-stopped
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+
+    ports:
+      - "127.0.0.1:${MONGO_PORT:-27018}:27017"
+
+    volumes:
+      - flowwatch_mongo_data:/data/db
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mongosh --quiet --host localhost --port 27017 --username \"$$MONGO_INITDB_ROOT_USERNAME\" --password \"$$MONGO_INITDB_ROOT_PASSWORD\" --authenticationDatabase admin --eval \"quit(db.adminCommand('ping').ok ? 0 : 2)\""
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+    networks:
+      - flowwatch_core
+
 volumes:
   flowwatch_postgres_data:
     name: flowwatch_postgres_data
+
+  flowwatch_mongo_data:
+    name: flowwatch_mongo_data
 
 networks:
   flowwatch_core:
