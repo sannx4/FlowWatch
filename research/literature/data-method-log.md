@@ -263,3 +263,44 @@ No paper-level claim will be based on the Week-1 sample alone.
 That scope is consistent with the roadmap: Day 8 is specifically the hardened client, while pagination, run tracking, checksums, validation/quarantine, and broader failure injection are deliberately assigned to later days. :chatgpt-content-reference{index="1"}
 
 After the smoke test and the two explicit fault tests, send me their output. Then we’ll do the final Day-8 Git/PR gate.
+
+## 2026-10-11 — Day 9: Explicit top/skip pagination contract
+
+### Assumption
+
+Complete temporal extraction requires deterministic traversal of the
+source result set.
+
+A pagination defect can silently duplicate or omit source observations,
+which would change the effective temporal history used by later
+forecasting and uncertainty-calibration experiments.
+
+Pagination therefore belongs to the research data-integrity boundary,
+not merely to convenience code.
+
+### Observation
+
+World Bank source pagination was moved into a reusable iterator built
+on top of the hardened Day-8 HTTP client.
+
+The paginator exposes, for every yielded page:
+
+- page number;
+- source offset;
+- returned record count;
+- source-reported total count;
+- raw page bytes;
+- request ID;
+- HTTP status;
+- attempts consumed;
+- request duration;
+- request URL;
+- requested top;
+- requested skip.
+
+Pagination follows the deterministic local rule:
+
+```text
+page 1 -> skip = start_skip
+page 2 -> skip = start_skip + page_size
+page 3 -> skip = start_skip + 2 * page_size
