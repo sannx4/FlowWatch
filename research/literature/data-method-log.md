@@ -258,3 +258,8 @@ A later focused literature gate will attempt to falsify the provisional
 cross-horizon gap before MACH-CP development.
 
 No paper-level claim will be based on the Week-1 sample alone.
+
+
+That scope is consistent with the roadmap: Day 8 is specifically the hardened client, while pagination, run tracking, checksums, validation/quarantine, and broader failure injection are deliberately assigned to later days. :chatgpt-content-reference{index="1"}
+
+After the smoke test and the two explicit fault tests, send me their output. Then we’ll do the final Day-8 Git/PR gate.
