@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 
-
 DATA_PATH = Path("data/raw/world_bank_sample.json")
 
 
@@ -18,7 +17,7 @@ def load_records():
     elif isinstance(payload, list):
         records = payload
     else:
-        raise ValueError("Unexpected JSON structure")
+        raise TypeError("Unexpected JSON structure")
 
     return records
 

@@ -134,3 +134,127 @@ All later components will reuse the shared correlation fields rather than defini
 MongoDB raw-document semantics, indexes, source envelopes, replay behavior, and lineage acceptance tests are deferred until the dedicated raw-lineage phase.
 
 CI will be expanded incrementally as migrations, ingestion, integration testing, data contracts, and research-integrity checks are introduced.
+
+## 2026-10-11 — Day 7: Real-data vertical slice and focused research charter
+
+### Assumption
+
+Research results are only defensible if canonical temporal observations
+can be traced to the exact raw evidence from which they were produced.
+
+The operational schema must also retain sufficient event-time
+information to later construct forecast origins and horizon-specific
+maturity logic.
+
+### Observation
+
+A fresh World Bank API request returned a source population count of
+1,612,290 records.
+
+The Day-7 experiment selected 100 real source records.
+
+The selected records represented 100 reporting-period snapshots of one
+credit (`IDA00010`), belonging to one project, one country and one
+region.
+
+The exact API-response bytes were preserved in MongoDB.
+
+The 100 source records were also retained individually before
+transformation.
+
+A minimal deterministic transform populated the normalized PostgreSQL
+operational schema.
+
+Observed counts were:
+
+- regions: 1
+- countries: 1
+- projects: 1
+- credits: 1
+- credit_snapshots: 100
+- Mongo raw records: 100
+- Mongo raw payloads: 1
+
+One PostgreSQL snapshot was successfully traced to the matching MongoDB
+source record through `ingestion_run_id`, `source_record_key`, and
+`source_checksum`.
+
+The PostgreSQL and MongoDB record checksums matched.
+
+The MongoDB whole-response bytes also reproduced the expected source
+SHA-256 checksum.
+
+`credit_snapshots.end_of_period` was sufficient to construct candidate
+3-, 6- and 12-month target dates.
+
+### Scientific Relevance
+
+The result establishes the minimum temporal and provenance foundation
+required for later conformal experiments.
+
+It does not establish research novelty.
+
+The focused research hypothesis remains whether already-matured
+short-horizon residuals contain useful information about unresolved
+longer-horizon calibration errors.
+
+### Nearest Related-Work Buckets
+
+- adaptive conformal prediction under shift;
+- change-point conformal adaptation;
+- online conformal prediction;
+- multi-horizon calibration;
+- non-exchangeable panel data;
+- delayed or incomplete feedback;
+- label-unavailable calibration;
+- coverage-efficiency optimization.
+
+### Validity Threats
+
+The 100-row sample contains only one credit, project, country and
+region.
+
+It therefore cannot establish:
+
+- cross-credit generality;
+- cross-country behaviour;
+- realistic null-pattern diversity;
+- full schema stability;
+- cross-horizon residual dependence;
+- distribution-shift behaviour.
+
+Calendar addition to `end_of_period` only produces candidate target
+dates. It does not yet define the correct observed-snapshot lookup rule.
+
+For example, adding three months to 30-Apr produces 30-Jul even though a
+monthly reporting series may contain 31-Jul.
+
+Actual maturity and label availability therefore require a dedicated
+policy.
+
+The Day-7 implementation also performs sequential database operations
+and required approximately 130.9 seconds for 100 records.
+
+This is correctness evidence, not production throughput evidence.
+
+### Mitigation
+
+Later ingestion work will validate the source across broader pages and
+the complete history.
+
+The production ingestion-run and raw-envelope models will replace the
+minimal Day-7 scaffolding.
+
+The research-data phase will explicitly implement:
+
+- forecast origin;
+- target lookup;
+- reporting-gap handling;
+- matures_at;
+- label_available_at;
+- evidence eligibility.
+
+A later focused literature gate will attempt to falsify the provisional
+cross-horizon gap before MACH-CP development.
+
+No paper-level claim will be based on the Week-1 sample alone.
