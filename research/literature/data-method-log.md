@@ -304,3 +304,90 @@ Pagination follows the deterministic local rule:
 page 1 -> skip = start_skip
 page 2 -> skip = start_skip + page_size
 page 3 -> skip = start_skip + 2 * page_size
+
+## Day 10 — Ingestion run lifecycle and resume lineage
+
+### Assumption
+
+A reproducible ingestion pipeline requires a persistent execution identity for every
+source-acquisition attempt.
+
+Without run-level metadata, a failed fetch may be visible in application logs but
+cannot be reliably connected to the source resource, code version, progress reached,
+or a later recovery attempt.
+
+### Observation
+
+Introduced a persistent `ingestion_runs` model containing:
+
+- `run_id`
+- source dataset and resource identifiers
+- `started_at`
+- `completed_at`
+- lifecycle `status`
+- completed `pages`
+- ingested `rows`
+- `page_size`
+- `code_version`
+- `failure_reason`
+- `resumed_from_run_id`
+- `resume_from_page`
+- `resume_from_offset`
+
+The lifecycle is:
+
+`RUNNING -> SUCCEEDED`
+
+or:
+
+`RUNNING -> FAILED`
+
+A failed run is preserved as terminal historical evidence rather than being rewritten.
+
+A resumed attempt creates a new ingestion run and points back to the failed run through
+`resumed_from_run_id`.
+
+PostgreSQL proof showed that a failed run remained queryable from a new database
+session after the original session closed.
+
+For a failed run that completed two pages at a page size of 100, the resumed run
+recorded:
+
+- `resume_from_page = 3`
+- `resume_from_offset = 200`
+
+This preserves the execution lineage between the failed attempt and the new attempt.
+
+### Nearest related-work bucket
+
+- reproducible data acquisition
+- execution provenance
+- ingestion observability
+- failure recovery
+- workflow lineage
+
+### Validity threat
+
+The Day 10 resume coordinates represent run-level progress metadata only.
+
+They do not yet prove that every page counted as completed was durably persisted into
+raw storage before the progress counter advanced.
+
+A process failure between source retrieval and durable raw persistence could therefore
+make the run-level boundary insufficient for exact crash recovery.
+
+The stored `code_version` is also supplied by the caller and must remain tied to the
+actual executed revision.
+
+### Mitigation / follow-up
+
+Day 11 adds checksums and manifests to strengthen source identity and reproducibility.
+
+Later raw-storage work will preserve source payloads independently of operational
+tables.
+
+Day 31 will introduce durable checkpoint semantics where progress is advanced only
+after the corresponding raw data has been successfully persisted.
+
+Therefore, the Day 10 mechanism should be described as run-level resume lineage, not
+as a durable crash-recovery checkpoint.
