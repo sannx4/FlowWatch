@@ -479,3 +479,78 @@ been successfully persisted.
 
 Archive manifests will later verify that retained historical raw artifacts still match
 their original checksums.
+
+## Day 12 — Source-schema validation and rejected-record quarantine
+
+### Assumption
+
+Source parsing must be separated from business transformation so that malformed source
+representations cannot silently change the canonical dataset.
+
+A malformed date or numeric value should therefore produce explicit evidence of
+rejection while allowing other valid records in the same page to continue through the
+pipeline.
+
+### Observation
+
+FlowWatch now has a Pydantic-based source-record parser representing the currently
+observed World Bank credit-record shape.
+
+The parser explicitly handles the observed `DD-Mon-YYYY` date representation, native
+JSON numeric values, numeric strings, and legitimate null values.
+
+Financial values are represented as `Decimal` after parsing rather than binary floating
+point.
+
+Validation does not create canonical Region, Country, Project, Credit or Snapshot
+objects. It only establishes whether a source record satisfies the current source
+parsing contract.
+
+Invalid records are converted into rejected-record envelopes containing page/run
+lineage, the original raw record, the source page checksum, the source position and
+machine-readable reason codes.
+
+Controlled fixtures demonstrated that:
+
+- a valid source-shaped record is accepted;
+- an impossible date is rejected with `invalid_date`;
+- malformed numeric text is rejected with `invalid_numeric`;
+- rejected records retain their original payload;
+- valid records in the same page continue processing rather than the entire page
+  crashing.
+
+### Nearest related-work bucket
+
+- schema-on-read validation
+- data contracts
+- defensive data ingestion
+- rejected-record quarantine / dead-letter handling
+- reproducible preprocessing
+- data-quality provenance
+
+### Validity threat
+
+The current parser is derived from the source representations observed so far and may
+not capture all legitimate historical World Bank variations.
+
+A strict parser can therefore create false rejections if older pages contain previously
+unseen but valid date, numeric, nullability or field representations.
+
+Conversely, allowing additive fields means an upstream field addition is preserved but
+does not automatically imply that its semantics are understood.
+
+A rejection reason is therefore evidence that a record violates the current parser,
+not proof that the upstream observation itself is semantically invalid.
+
+### Mitigation / follow-up
+
+Rejected records preserve their exact raw values and lineage so parser decisions can be
+audited and replayed.
+
+Later source-variation analysis will test non-adjacent and larger pages before the
+source contract is treated as stable.
+
+Business-level quality rules remain separate from source-type parsing.
+
+Persistent quarantine and remediation state will later allow corrected parsers to
+reprocess rejected records without re-fetching the source.
