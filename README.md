@@ -1,5 +1,7 @@
 FlowWatch
 
+[![CI](https://github.com/sannx4/FlowWatch/actions/workflows/ci.yml/badge.svg)](https://github.com/sannx4/FlowWatch/actions/workflows/ci.yml)
+
 Development-finance observability and temporal analytics over World Bank IDA financing data.
 A data engineering project focused on reliable ingestion, historical modeling, analytical warehousing, database systems, and explainable financial metrics.
 

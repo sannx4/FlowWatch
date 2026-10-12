@@ -78,13 +78,19 @@ class WorldBankClientConfig:
                 "user_agent cannot be empty."
             )
 
-        if self.connect_timeout_seconds <= 0:
+        if (
+            self.connect_timeout_seconds
+            <= 0
+        ):
             raise ValueError(
                 "connect_timeout_seconds must be "
                 "greater than zero."
             )
 
-        if self.read_timeout_seconds <= 0:
+        if (
+            self.read_timeout_seconds
+            <= 0
+        ):
             raise ValueError(
                 "read_timeout_seconds must be "
                 "greater than zero."
@@ -95,13 +101,19 @@ class WorldBankClientConfig:
                 "max_retries cannot be negative."
             )
 
-        if self.backoff_base_seconds < 0:
+        if (
+            self.backoff_base_seconds
+            < 0
+        ):
             raise ValueError(
                 "backoff_base_seconds cannot be "
                 "negative."
             )
 
-        if self.backoff_max_seconds < 0:
+        if (
+            self.backoff_max_seconds
+            < 0
+        ):
             raise ValueError(
                 "backoff_max_seconds cannot be "
                 "negative."
@@ -140,7 +152,9 @@ class WorldBankResponse:
     record_count: int
 
 
-class WorldBankClientError(RuntimeError):
+class WorldBankClientError(
+    RuntimeError
+):
     """Structured failure produced by the World Bank client."""
 
     def __init__(
@@ -156,49 +170,95 @@ class WorldBankClientError(RuntimeError):
         status_code: int | None = None,
         cause_type: str | None = None,
     ) -> None:
-        super().__init__(message)
+        super().__init__(
+            message
+        )
 
-        self.error_type = error_type
-        self.request_id = request_id
+        self.error_type = (
+            error_type
+        )
 
-        self.attempts = attempts
-        self.max_attempts = max_attempts
+        self.request_id = (
+            request_id
+        )
 
-        self.retryable = retryable
+        self.attempts = (
+            attempts
+        )
+
+        self.max_attempts = (
+            max_attempts
+        )
+
+        self.retryable = (
+            retryable
+        )
 
         self.url = url
 
-        self.status_code = status_code
-        self.cause_type = cause_type
+        self.status_code = (
+            status_code
+        )
 
-    def metadata(self) -> dict[str, Any]:
+        self.cause_type = (
+            cause_type
+        )
+
+    def metadata(
+        self,
+    ) -> dict[str, Any]:
         """Return machine-readable failure metadata."""
 
         return {
-            "error_type": self.error_type,
-            "request_id": self.request_id,
-            "attempts": self.attempts,
-            "max_attempts": self.max_attempts,
-            "retryable": self.retryable,
-            "url": self.url,
-            "status_code": self.status_code,
-            "cause_type": self.cause_type,
+            "error_type": (
+                self.error_type
+            ),
+            "request_id": (
+                self.request_id
+            ),
+            "attempts": (
+                self.attempts
+            ),
+            "max_attempts": (
+                self.max_attempts
+            ),
+            "retryable": (
+                self.retryable
+            ),
+            "url": (
+                self.url
+            ),
+            "status_code": (
+                self.status_code
+            ),
+            "cause_type": (
+                self.cause_type
+            ),
         }
 
-    def __str__(self) -> str:
+    def __str__(
+        self,
+    ) -> str:
         status = (
-            f", status_code={self.status_code}"
-            if self.status_code is not None
+            f", status_code="
+            f"{self.status_code}"
+            if (
+                self.status_code
+                is not None
+            )
             else ""
         )
 
         return (
             f"{super().__str__()} "
-            f"[error_type={self.error_type}, "
-            f"attempts={self.attempts}/"
+            f"[error_type="
+            f"{self.error_type}, "
+            f"attempts="
+            f"{self.attempts}/"
             f"{self.max_attempts}"
             f"{status}, "
-            f"request_id={self.request_id}]"
+            f"request_id="
+            f"{self.request_id}]"
         )
 
 
@@ -219,15 +279,26 @@ class WorldBankClient:
 
     def __init__(
         self,
-        config: WorldBankClientConfig | None = None,
+        config: (
+            WorldBankClientConfig
+            | None
+        ) = None,
         *,
-        session: requests.Session | None = None,
-        sleep: Callable[[float], None] = time.sleep,
+        session: (
+            requests.Session
+            | None
+        ) = None,
+        sleep: Callable[
+            [float],
+            None,
+        ] = time.sleep,
     ) -> None:
         self.config = (
             config
             if config is not None
-            else WorldBankClientConfig()
+            else (
+                WorldBankClientConfig()
+            )
         )
 
         self._owns_session = (
@@ -242,11 +313,16 @@ class WorldBankClient:
 
         self._sleep = sleep
 
-        self._logger = get_logger(
-            "ingestion.worldbank-client"
+        self._logger = (
+            get_logger(
+                "ingestion."
+                "worldbank-client"
+            )
         )
 
-    def __enter__(self) -> Self:
+    def __enter__(
+        self,
+    ) -> Self:
         """Enter the client context."""
 
         return self
@@ -261,7 +337,9 @@ class WorldBankClient:
 
         self.close()
 
-    def close(self) -> None:
+    def close(
+        self,
+    ) -> None:
         """Close the internally owned HTTP session."""
 
         if self._owns_session:
@@ -277,7 +355,8 @@ class WorldBankClient:
 
         if top <= 0:
             raise ValueError(
-                "top must be greater than zero."
+                "top must be greater "
+                "than zero."
             )
 
         if skip < 0:
@@ -293,26 +372,43 @@ class WorldBankClient:
             request_id=request_id
         )
 
-        params = {
-            "datasetId": self.config.dataset_id,
-            "resourceId": self.config.resource_id,
+        params: dict[
+            str,
+            str | int,
+        ] = {
+            "datasetId": (
+                self.config.dataset_id
+            ),
+            "resourceId": (
+                self.config.resource_id
+            ),
             "top": top,
             "skip": skip,
             "type": "json",
         }
 
-        headers = {
-            "Accept": "application/json",
-            "User-Agent": self.config.user_agent,
+        headers: dict[
+            str,
+            str,
+        ] = {
+            "Accept": (
+                "application/json"
+            ),
+            "User-Agent": (
+                self.config.user_agent
+            ),
         }
 
         timeout = (
-            self.config.connect_timeout_seconds,
-            self.config.read_timeout_seconds,
+            self.config
+            .connect_timeout_seconds,
+            self.config
+            .read_timeout_seconds,
         )
 
         max_attempts = (
-            self.config.max_retries + 1
+            self.config.max_retries
+            + 1
         )
 
         started_at = (
@@ -324,37 +420,61 @@ class WorldBankClient:
             max_attempts + 1,
         ):
             try:
-                response = self._session.get(
-                    self.config.base_url,
-                    params=params,
-                    headers=headers,
-                    timeout=timeout,
+                response = (
+                    self._session.get(
+                        self.config.base_url,
+                        params=params,
+                        headers=headers,
+                        timeout=timeout,
+                    )
                 )
 
-            except requests.exceptions.Timeout as exc:
-                if attempt >= max_attempts:
+            except (
+                requests.exceptions.Timeout
+            ) as exc:
+                if (
+                    attempt
+                    >= max_attempts
+                ):
                     self._raise_failure(
                         message=(
-                            "World Bank request exhausted "
-                            "the timeout retry budget."
+                            "World Bank request "
+                            "exhausted the timeout "
+                            "retry budget."
                         ),
                         error_type="timeout",
-                        request_id=request_id,
+                        request_id=(
+                            request_id
+                        ),
                         attempts=attempt,
-                        max_attempts=max_attempts,
+                        max_attempts=(
+                            max_attempts
+                        ),
                         retryable=True,
                         status_code=None,
-                        cause_type=type(exc).__name__,
-                        started_at=started_at,
+                        cause_type=(
+                            type(
+                                exc
+                            ).__name__
+                        ),
+                        started_at=(
+                            started_at
+                        ),
                         top=top,
                         skip=skip,
                     )
 
                 self._retry(
-                    request_id=request_id,
+                    request_id=(
+                        request_id
+                    ),
                     attempt=attempt,
-                    max_attempts=max_attempts,
-                    error_type="timeout",
+                    max_attempts=(
+                        max_attempts
+                    ),
+                    error_type=(
+                        "timeout"
+                    ),
                     status_code=None,
                     top=top,
                     skip=skip,
@@ -363,31 +483,55 @@ class WorldBankClient:
                 continue
 
             except (
-                requests.exceptions.ConnectionError
+                requests.exceptions
+                .ConnectionError
             ) as exc:
-                if attempt >= max_attempts:
+                if (
+                    attempt
+                    >= max_attempts
+                ):
                     self._raise_failure(
                         message=(
-                            "World Bank request exhausted "
-                            "the connection retry budget."
+                            "World Bank request "
+                            "exhausted the "
+                            "connection retry "
+                            "budget."
                         ),
-                        error_type="connection_error",
-                        request_id=request_id,
+                        error_type=(
+                            "connection_error"
+                        ),
+                        request_id=(
+                            request_id
+                        ),
                         attempts=attempt,
-                        max_attempts=max_attempts,
+                        max_attempts=(
+                            max_attempts
+                        ),
                         retryable=True,
                         status_code=None,
-                        cause_type=type(exc).__name__,
-                        started_at=started_at,
+                        cause_type=(
+                            type(
+                                exc
+                            ).__name__
+                        ),
+                        started_at=(
+                            started_at
+                        ),
                         top=top,
                         skip=skip,
                     )
 
                 self._retry(
-                    request_id=request_id,
+                    request_id=(
+                        request_id
+                    ),
                     attempt=attempt,
-                    max_attempts=max_attempts,
-                    error_type="connection_error",
+                    max_attempts=(
+                        max_attempts
+                    ),
+                    error_type=(
+                        "connection_error"
+                    ),
                     status_code=None,
                     top=top,
                     skip=skip,
@@ -396,22 +540,36 @@ class WorldBankClient:
                 continue
 
             except (
-                requests.exceptions.RequestException
+                requests.exceptions
+                .RequestException
             ) as exc:
                 self._raise_failure(
                     message=(
-                        "World Bank request failed "
-                        "with a non-retryable "
+                        "World Bank request "
+                        "failed with a "
+                        "non-retryable "
                         "transport error."
                     ),
-                    error_type="request_error",
-                    request_id=request_id,
+                    error_type=(
+                        "request_error"
+                    ),
+                    request_id=(
+                        request_id
+                    ),
                     attempts=attempt,
-                    max_attempts=max_attempts,
+                    max_attempts=(
+                        max_attempts
+                    ),
                     retryable=False,
                     status_code=None,
-                    cause_type=type(exc).__name__,
-                    started_at=started_at,
+                    cause_type=(
+                        type(
+                            exc
+                        ).__name__
+                    ),
+                    started_at=(
+                        started_at
+                    ),
                     top=top,
                     skip=skip,
                 )
@@ -422,36 +580,55 @@ class WorldBankClient:
 
             if (
                 status_code
-                in self.RETRYABLE_STATUS_CODES
+                in self
+                .RETRYABLE_STATUS_CODES
             ):
-                if attempt >= max_attempts:
+                if (
+                    attempt
+                    >= max_attempts
+                ):
                     self._raise_failure(
                         message=(
-                            "World Bank request exhausted "
-                            "the HTTP retry budget."
+                            "World Bank request "
+                            "exhausted the HTTP "
+                            "retry budget."
                         ),
                         error_type=(
                             "retryable_http_status"
                         ),
-                        request_id=request_id,
+                        request_id=(
+                            request_id
+                        ),
                         attempts=attempt,
-                        max_attempts=max_attempts,
+                        max_attempts=(
+                            max_attempts
+                        ),
                         retryable=True,
-                        status_code=status_code,
+                        status_code=(
+                            status_code
+                        ),
                         cause_type=None,
-                        started_at=started_at,
+                        started_at=(
+                            started_at
+                        ),
                         top=top,
                         skip=skip,
                     )
 
                 self._retry(
-                    request_id=request_id,
+                    request_id=(
+                        request_id
+                    ),
                     attempt=attempt,
-                    max_attempts=max_attempts,
+                    max_attempts=(
+                        max_attempts
+                    ),
                     error_type=(
                         "retryable_http_status"
                     ),
-                    status_code=status_code,
+                    status_code=(
+                        status_code
+                    ),
                     top=top,
                     skip=skip,
                 )
@@ -465,17 +642,29 @@ class WorldBankClient:
             ):
                 self._raise_failure(
                     message=(
-                        "World Bank request returned "
-                        "a non-success HTTP status."
+                        "World Bank request "
+                        "returned a "
+                        "non-success HTTP "
+                        "status."
                     ),
-                    error_type="http_status",
-                    request_id=request_id,
+                    error_type=(
+                        "http_status"
+                    ),
+                    request_id=(
+                        request_id
+                    ),
                     attempts=attempt,
-                    max_attempts=max_attempts,
+                    max_attempts=(
+                        max_attempts
+                    ),
                     retryable=False,
-                    status_code=status_code,
+                    status_code=(
+                        status_code
+                    ),
                     cause_type=None,
-                    started_at=started_at,
+                    started_at=(
+                        started_at
+                    ),
                     top=top,
                     skip=skip,
                 )
@@ -485,22 +674,38 @@ class WorldBankClient:
             )
 
             try:
-                payload = response.json()
+                payload = (
+                    response.json()
+                )
 
             except ValueError as exc:
                 self._raise_failure(
                     message=(
-                        "World Bank response was "
-                        "not valid JSON."
+                        "World Bank response "
+                        "was not valid JSON."
                     ),
-                    error_type="invalid_json",
-                    request_id=request_id,
+                    error_type=(
+                        "invalid_json"
+                    ),
+                    request_id=(
+                        request_id
+                    ),
                     attempts=attempt,
-                    max_attempts=max_attempts,
+                    max_attempts=(
+                        max_attempts
+                    ),
                     retryable=False,
-                    status_code=status_code,
-                    cause_type=type(exc).__name__,
-                    started_at=started_at,
+                    status_code=(
+                        status_code
+                    ),
+                    cause_type=(
+                        type(
+                            exc
+                        ).__name__
+                    ),
+                    started_at=(
+                        started_at
+                    ),
                     top=top,
                     skip=skip,
                 )
@@ -516,15 +721,27 @@ class WorldBankClient:
                 is not None
             ):
                 self._raise_failure(
-                    message=validation_error,
-                    error_type="invalid_payload",
-                    request_id=request_id,
+                    message=(
+                        validation_error
+                    ),
+                    error_type=(
+                        "invalid_payload"
+                    ),
+                    request_id=(
+                        request_id
+                    ),
                     attempts=attempt,
-                    max_attempts=max_attempts,
+                    max_attempts=(
+                        max_attempts
+                    ),
                     retryable=False,
-                    status_code=status_code,
+                    status_code=(
+                        status_code
+                    ),
                     cause_type=None,
-                    started_at=started_at,
+                    started_at=(
+                        started_at
+                    ),
                     top=top,
                     skip=skip,
                 )
@@ -538,9 +755,12 @@ class WorldBankClient:
             )
 
             duration_ms = (
-                time.perf_counter()
-                - started_at
-            ) * 1000
+                (
+                    time.perf_counter()
+                    - started_at
+                )
+                * 1000
+            )
 
             response_url = (
                 response.url
@@ -549,37 +769,65 @@ class WorldBankClient:
 
             log_event(
                 self._logger,
-                "worldbank_request_succeeded",
+                (
+                    "worldbank_request_"
+                    "succeeded"
+                ),
                 status="success",
-                request_id=request_id,
-                duration_ms=duration_ms,
+                request_id=(
+                    request_id
+                ),
+                duration_ms=(
+                    duration_ms
+                ),
                 attempt=attempt,
-                max_attempts=max_attempts,
-                status_code=status_code,
+                max_attempts=(
+                    max_attempts
+                ),
+                status_code=(
+                    status_code
+                ),
                 top=top,
                 skip=skip,
-                record_count=len(records),
-                total_count=total_count,
-                url=response_url,
+                record_count=len(
+                    records
+                ),
+                total_count=(
+                    total_count
+                ),
+                url=(
+                    response_url
+                ),
             )
 
             return WorldBankResponse(
                 payload=payload,
                 raw_bytes=raw_bytes,
-                status_code=status_code,
-                request_id=request_id,
+                status_code=(
+                    status_code
+                ),
+                request_id=(
+                    request_id
+                ),
                 url=response_url,
                 attempts=attempt,
-                duration_ms=duration_ms,
+                duration_ms=(
+                    duration_ms
+                ),
                 top=top,
                 skip=skip,
-                total_count=total_count,
-                record_count=len(records),
+                total_count=(
+                    total_count
+                ),
+                record_count=len(
+                    records
+                ),
             )
 
         raise AssertionError(
-            "World Bank retry loop exited "
-            "without returning or raising."
+            "World Bank retry loop "
+            "exited without returning "
+            "or raising."
         )
 
     def _retry(
@@ -589,7 +837,10 @@ class WorldBankClient:
         attempt: int,
         max_attempts: int,
         error_type: str,
-        status_code: int | None,
+        status_code: (
+            int
+            | None
+        ),
         top: int,
         skip: int,
     ) -> None:
@@ -603,17 +854,31 @@ class WorldBankClient:
 
         log_event(
             self._logger,
-            "worldbank_request_retry",
+            (
+                "worldbank_request_retry"
+            ),
             status="retry",
-            request_id=request_id,
+            request_id=(
+                request_id
+            ),
             attempt=attempt,
-            max_attempts=max_attempts,
-            error_type=error_type,
-            status_code=status_code,
-            backoff_seconds=backoff_seconds,
+            max_attempts=(
+                max_attempts
+            ),
+            error_type=(
+                error_type
+            ),
+            status_code=(
+                status_code
+            ),
+            backoff_seconds=(
+                backoff_seconds
+            ),
             top=top,
             skip=skip,
-            url=self.config.base_url,
+            url=(
+                self.config.base_url
+            ),
         )
 
         self._sleep(
@@ -627,13 +892,21 @@ class WorldBankClient:
         """Calculate bounded exponential-backoff delay."""
 
         delay = (
-            self.config.backoff_base_seconds
-            * (2 ** (attempt - 1))
+            self.config
+            .backoff_base_seconds
+            * (
+                2
+                ** (
+                    attempt
+                    - 1
+                )
+            )
         )
 
         return min(
             delay,
-            self.config.backoff_max_seconds,
+            self.config
+            .backoff_max_seconds,
         )
 
     def _raise_failure(
@@ -645,8 +918,14 @@ class WorldBankClient:
         attempts: int,
         max_attempts: int,
         retryable: bool,
-        status_code: int | None,
-        cause_type: str | None,
+        status_code: (
+            int
+            | None
+        ),
+        cause_type: (
+            str
+            | None
+        ),
         started_at: float,
         top: int,
         skip: int,
@@ -654,37 +933,72 @@ class WorldBankClient:
         """Log structured failure metadata and raise."""
 
         duration_ms = (
-            time.perf_counter()
-            - started_at
-        ) * 1000
+            (
+                time.perf_counter()
+                - started_at
+            )
+            * 1000
+        )
 
         log_event(
             self._logger,
-            "worldbank_request_failed",
+            (
+                "worldbank_request_failed"
+            ),
             status="failure",
-            request_id=request_id,
-            duration_ms=duration_ms,
-            error_type=error_type,
+            request_id=(
+                request_id
+            ),
+            duration_ms=(
+                duration_ms
+            ),
+            error_type=(
+                error_type
+            ),
             attempts=attempts,
-            max_attempts=max_attempts,
-            retryable=retryable,
-            status_code=status_code,
-            cause_type=cause_type,
+            max_attempts=(
+                max_attempts
+            ),
+            retryable=(
+                retryable
+            ),
+            status_code=(
+                status_code
+            ),
+            cause_type=(
+                cause_type
+            ),
             top=top,
             skip=skip,
-            url=self.config.base_url,
+            url=(
+                self.config.base_url
+            ),
         )
 
         raise WorldBankClientError(
             message,
-            error_type=error_type,
-            request_id=request_id,
+            error_type=(
+                error_type
+            ),
+            request_id=(
+                request_id
+            ),
             attempts=attempts,
-            max_attempts=max_attempts,
-            retryable=retryable,
-            url=self.config.base_url,
-            status_code=status_code,
-            cause_type=cause_type,
+            max_attempts=(
+                max_attempts
+            ),
+            retryable=(
+                retryable
+            ),
+            url=(
+                self.config.base_url
+            ),
+            status_code=(
+                status_code
+            ),
+            cause_type=(
+                cause_type
+            ),
         )
 
     @staticmethod
@@ -702,13 +1016,19 @@ class WorldBankClient:
                 "must be an object."
             )
 
-        if "count" not in payload:
+        if (
+            "count"
+            not in payload
+        ):
             return (
                 "World Bank response is "
                 "missing 'count'."
             )
 
-        if "data" not in payload:
+        if (
+            "data"
+            not in payload
+        ):
             return (
                 "World Bank response is "
                 "missing 'data'."
@@ -733,14 +1053,16 @@ class WorldBankClient:
             )
         ):
             return (
-                "World Bank response 'count' "
-                "must be an integer."
+                "World Bank response "
+                "'count' must be an "
+                "integer."
             )
 
         if total_count < 0:
             return (
-                "World Bank response 'count' "
-                "cannot be negative."
+                "World Bank response "
+                "'count' cannot be "
+                "negative."
             )
 
         if not isinstance(
@@ -748,16 +1070,17 @@ class WorldBankClient:
             list,
         ):
             return (
-                "World Bank response 'data' "
-                "must be a list."
+                "World Bank response "
+                "'data' must be a list."
             )
 
         if total_count < len(
             records
         ):
             return (
-                "World Bank response 'count' "
-                "cannot be smaller than the "
+                "World Bank response "
+                "'count' cannot be "
+                "smaller than the "
                 "returned record count."
             )
 

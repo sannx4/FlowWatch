@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from pydantic import ValidationError
+from pydantic_core import ErrorDetails
 
 from src.observability.logging import (
     get_logger,
@@ -87,43 +88,41 @@ class SourceRecordValidationService:
             raw_record,
             Mapping,
         ):
-            return (
-                RejectedRecordEnvelope(
-                    run_id=context.run_id,
-                    page_number=(
-                        context.page_number
-                    ),
-                    page_offset=(
-                        context.page_offset
-                    ),
-                    record_index=record_index,
-                    source_record_offset=(
-                        source_record_offset
-                    ),
-                    source_checksum=(
-                        context.source_checksum
-                    ),
-                    raw_record=raw_record,
-                    reasons=(
-                        RejectionIssue(
-                            reason_code=(
-                                RejectionReasonCode
-                                .INVALID_RECORD_TYPE
-                            ),
-                            field_path="$",
-                            message=(
-                                "source record must "
-                                "be a JSON object"
-                            ),
-                            offending_value=(
-                                raw_record
-                            ),
+            return RejectedRecordEnvelope(
+                run_id=context.run_id,
+                page_number=(
+                    context.page_number
+                ),
+                page_offset=(
+                    context.page_offset
+                ),
+                record_index=record_index,
+                source_record_offset=(
+                    source_record_offset
+                ),
+                source_checksum=(
+                    context.source_checksum
+                ),
+                raw_record=raw_record,
+                reasons=(
+                    RejectionIssue(
+                        reason_code=(
+                            RejectionReasonCode
+                            .INVALID_RECORD_TYPE
+                        ),
+                        field_path="$",
+                        message=(
+                            "source record must "
+                            "be a JSON object"
+                        ),
+                        offending_value=(
+                            raw_record
                         ),
                     ),
-                    rejected_at=(
-                        self._clock()
-                    ),
-                )
+                ),
+                rejected_at=(
+                    self._clock()
+                ),
             )
 
         source_record = dict(
@@ -148,34 +147,7 @@ class SourceRecordValidationService:
                 )
             )
 
-            return (
-                RejectedRecordEnvelope(
-                    run_id=context.run_id,
-                    page_number=(
-                        context.page_number
-                    ),
-                    page_offset=(
-                        context.page_offset
-                    ),
-                    record_index=record_index,
-                    source_record_offset=(
-                        source_record_offset
-                    ),
-                    source_checksum=(
-                        context.source_checksum
-                    ),
-                    raw_record=(
-                        source_record
-                    ),
-                    reasons=reasons,
-                    rejected_at=(
-                        self._clock()
-                    ),
-                )
-            )
-
-        return (
-            ValidatedSourceRecordEnvelope(
+            return RejectedRecordEnvelope(
                 run_id=context.run_id,
                 page_number=(
                     context.page_number
@@ -190,8 +162,31 @@ class SourceRecordValidationService:
                 source_checksum=(
                     context.source_checksum
                 ),
-                record=parsed,
+                raw_record=(
+                    source_record
+                ),
+                reasons=reasons,
+                rejected_at=(
+                    self._clock()
+                ),
             )
+
+        return ValidatedSourceRecordEnvelope(
+            run_id=context.run_id,
+            page_number=(
+                context.page_number
+            ),
+            page_offset=(
+                context.page_offset
+            ),
+            record_index=record_index,
+            source_record_offset=(
+                source_record_offset
+            ),
+            source_checksum=(
+                context.source_checksum
+            ),
+            record=parsed,
         )
 
     def validate_page(
@@ -284,7 +279,7 @@ class SourceRecordValidationService:
 
     @staticmethod
     def _map_validation_error(
-        error: dict[str, Any],
+        error: ErrorDetails,
     ) -> RejectionIssue:
         location = error.get(
             "loc",

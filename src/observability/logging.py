@@ -4,6 +4,7 @@ import contextvars
 import json
 import logging
 import sys
+from collections.abc import MutableMapping
 from datetime import UTC, datetime
 from typing import Any
 
@@ -18,16 +19,29 @@ _REQUEST_ID: contextvars.ContextVar[str | None] = contextvars.ContextVar(
 )
 
 
-_STANDARD_LOG_FIELDS = set(logging.makeLogRecord({}).__dict__)
-_STANDARD_LOG_FIELDS.update({"message", "asctime"})
+_STANDARD_LOG_FIELDS = set(
+    logging.makeLogRecord({}).__dict__
+)
+
+_STANDARD_LOG_FIELDS.update(
+    {
+        "message",
+        "asctime",
+    }
+)
 
 
 class JsonFormatter(logging.Formatter):
     """Serialize log records as one JSON object per line."""
 
-    def format(self, record: logging.LogRecord) -> str:
+    def format(
+        self,
+        record: logging.LogRecord,
+    ) -> str:
         payload: dict[str, Any] = {
-            "timestamp": datetime.now(UTC).isoformat(),
+            "timestamp": datetime.now(
+                UTC
+            ).isoformat(),
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),
@@ -40,42 +54,93 @@ class JsonFormatter(logging.Formatter):
             "duration_ms",
             "status",
         ):
-            value = getattr(record, field, None)
+            value = getattr(
+                record,
+                field,
+                None,
+            )
 
             if value is not None:
                 payload[field] = value
 
-        for key, value in record.__dict__.items():
+        for (
+            key,
+            value,
+        ) in record.__dict__.items():
             if (
-                key not in _STANDARD_LOG_FIELDS
-                and key not in payload
+                key
+                not in _STANDARD_LOG_FIELDS
+                and key
+                not in payload
                 and value is not None
             ):
                 payload[key] = value
 
         if record.exc_info:
-            payload["exception"] = self.formatException(record.exc_info)
+            payload[
+                "exception"
+            ] = self.formatException(
+                record.exc_info
+            )
 
         return json.dumps(
             payload,
             default=str,
-            separators=(",", ":"),
+            separators=(
+                ",",
+                ":",
+            ),
         )
 
 
-class ContextLoggerAdapter(logging.LoggerAdapter):
+class ContextLoggerAdapter(
+    logging.LoggerAdapter
+):
     """Attach FlowWatch correlation context to every log event."""
 
     def process(
         self,
-        msg: Any,
-        kwargs: dict[str, Any],
-    ) -> tuple[Any, dict[str, Any]]:
-        extra = dict(kwargs.get("extra") or {})
+        msg: object,
+        kwargs: MutableMapping[
+            str,
+            Any,
+        ],
+    ) -> tuple[
+        object,
+        MutableMapping[
+            str,
+            Any,
+        ],
+    ]:
+        extra = dict(
+            kwargs.get(
+                "extra"
+            )
+            or {}
+        )
+
+        component = (
+            self.logger.name
+        )
+
+        if self.extra is not None:
+            configured_component = (
+                self.extra.get(
+                    "component"
+                )
+            )
+
+            if isinstance(
+                configured_component,
+                str,
+            ):
+                component = (
+                    configured_component
+                )
 
         extra.setdefault(
             "component",
-            self.extra["component"],
+            component,
         )
 
         extra.setdefault(
@@ -88,9 +153,14 @@ class ContextLoggerAdapter(logging.LoggerAdapter):
             _REQUEST_ID.get(),
         )
 
-        kwargs["extra"] = extra
+        kwargs[
+            "extra"
+        ] = extra
 
-        return msg, kwargs
+        return (
+            msg,
+            kwargs,
+        )
 
 
 def configure_logging(
@@ -98,17 +168,33 @@ def configure_logging(
 ) -> None:
     """Configure process-wide JSON logging."""
 
-    root_logger = logging.getLogger()
+    root_logger = (
+        logging.getLogger()
+    )
 
     root_logger.handlers.clear()
 
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(JsonFormatter())
+    handler = (
+        logging.StreamHandler(
+            sys.stdout
+        )
+    )
 
-    root_logger.addHandler(handler)
-    root_logger.setLevel(level)
+    handler.setFormatter(
+        JsonFormatter()
+    )
 
-    logging.captureWarnings(True)
+    root_logger.addHandler(
+        handler
+    )
+
+    root_logger.setLevel(
+        level
+    )
+
+    logging.captureWarnings(
+        True
+    )
 
 
 def set_correlation_ids(
@@ -118,15 +204,25 @@ def set_correlation_ids(
 ) -> None:
     """Attach correlation identifiers to the current execution context."""
 
-    _RUN_ID.set(run_id)
-    _REQUEST_ID.set(request_id)
+    _RUN_ID.set(
+        run_id
+    )
+
+    _REQUEST_ID.set(
+        request_id
+    )
 
 
 def clear_correlation_ids() -> None:
     """Clear correlation identifiers from the current context."""
 
-    _RUN_ID.set(None)
-    _REQUEST_ID.set(None)
+    _RUN_ID.set(
+        None
+    )
+
+    _REQUEST_ID.set(
+        None
+    )
 
 
 def get_logger(
@@ -134,11 +230,15 @@ def get_logger(
 ) -> ContextLoggerAdapter:
     """Return a logger carrying a stable component name."""
 
-    logger = logging.getLogger(f"flowwatch.{component}")
+    logger = logging.getLogger(
+        f"flowwatch.{component}"
+    )
 
     return ContextLoggerAdapter(
         logger,
-        {"component": component},
+        {
+            "component": component,
+        },
     )
 
 
@@ -152,13 +252,21 @@ def log_event(
 ) -> None:
     """Emit one structured FlowWatch event."""
 
-    extra: dict[str, Any] = {
+    extra: dict[
+        str,
+        Any,
+    ] = {
         "status": status,
         **fields,
     }
 
     if duration_ms is not None:
-        extra["duration_ms"] = round(duration_ms, 3)
+        extra[
+            "duration_ms"
+        ] = round(
+            duration_ms,
+            3,
+        )
 
     logger.info(
         message,
