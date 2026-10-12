@@ -2,13 +2,27 @@ name: CI
 
 on:
   pull_request:
+
   push:
     branches:
       - main
 
+  workflow_dispatch:
+    inputs:
+      negative_control:
+        description: >-
+          Deliberately break the retry assertion to prove
+          the ingestion CI gate fails.
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
 jobs:
   quality:
-    name: Ruff and pytest
+    name: Ruff and mypy
     runs-on: ubuntu-latest
 
     steps:
@@ -19,7 +33,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
+          cache: pip
 
       - name: Install dependencies
         run: |
@@ -27,7 +41,111 @@ jobs:
           python -m pip install -r requirements.txt
 
       - name: Ruff
-        run: ruff check src tests
+        run: |
+          ruff check src tests scripts
 
-      - name: Pytest
-        run: pytest -q
+      - name: Mypy ingestion and validation
+        run: |
+          mypy src/ingestion src/validation
+
+  ingestion-tests:
+    name: Ingestion tests and coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Inject Day-14 retry negative control
+        if: >-
+          ${{ github.event_name == 'workflow_dispatch'
+          && inputs.negative_control }}
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path(
+              "tests/faults/test_connection_reset.py"
+          )
+
+          source = path.read_text(
+              encoding="utf-8"
+          )
+
+          original = (
+              "assert error.attempts == 3"
+          )
+
+          broken = (
+              "assert error.attempts == 999"
+          )
+
+          if original not in source:
+              raise SystemExit(
+                  "Expected retry assertion was not found."
+              )
+
+          path.write_text(
+              source.replace(
+                  original,
+                  broken,
+                  1,
+              ),
+              encoding="utf-8",
+          )
+
+          print(
+              "Injected deliberate retry-test failure."
+          )
+
+      - name: Run ingestion tests with coverage
+        run: |
+          pytest tests/unit tests/faults \
+            -q \
+            --cov=src.ingestion \
+            --cov=src.validation \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ingestion-coverage
+          path: coverage.xml
+          if-no-files-found: warn
+          retention-days: 14
+
+  full-tests:
+    name: Full pytest suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Run full pytest suite
+        run: |
+          pytest -q

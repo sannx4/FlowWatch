@@ -46,3 +46,7 @@ htmlcov/
 build/
 dist/
 *.egg-info/
+
+.coverage
+coverage.xml
+htmlcov/

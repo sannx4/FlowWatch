@@ -573,3 +573,35 @@ The intended policy is:
 transient transport fault -> bounded retry
 record-level schema fault -> quarantine
 invalid response / duplicate / persistence failure -> fail closed
+
+## Day 14 — Ingestion CI gate
+
+### Assumption
+
+Source-ingestion reliability properties are not durable engineering evidence
+unless they are re-executed automatically in a clean environment after code
+changes.
+
+Local developer tests alone may hide undeclared dependencies,
+environment-specific behavior or regressions.
+
+### Observation
+
+FlowWatch now applies automated static and behavioral verification to the
+Week-2 ingestion boundary.
+
+Ruff checks code quality.
+
+Mypy checks the ingestion and validation modules.
+
+The ingestion/source-client and fault suites run with coverage reporting.
+
+The complete pytest suite remains an independent regression gate.
+
+Local Day-14 evidence currently consists of:
+
+```text
+72 unit/fault tests passed
+72 full-suite tests passed
+83% ingestion + validation coverage
+mypy clean across 13 source files
