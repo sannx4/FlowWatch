@@ -20,6 +20,7 @@ from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.db import ingestion_models as _ingestion_models  # noqa: F401
+from src.db import raw_manifest_models as _raw_manifest_models  # noqa: F401
 from src.db.base import Base
 
 
