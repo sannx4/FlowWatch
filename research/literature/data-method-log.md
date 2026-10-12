@@ -391,3 +391,91 @@ after the corresponding raw data has been successfully persisted.
 
 Therefore, the Day 10 mechanism should be described as run-level resume lineage, not
 as a durable crash-recovery checkpoint.
+
+## Day 11 — Raw page manifests and byte-level checksums
+
+### Assumption
+
+Reproducible source acquisition requires an integrity identity for every fetched page
+before business transformation changes its representation.
+
+An ingestion run identifier alone establishes execution identity but does not establish
+whether two source pages contained exactly the same bytes.
+
+Therefore each source page needs a deterministic content digest tied to its run/page
+metadata.
+
+### Observation
+
+FlowWatch now computes SHA-256 over the exact raw HTTP response bytes preserved by the
+source client.
+
+The checksum is calculated before downstream business transformation.
+
+Each fetched page can be represented by a `raw_page_manifests` row containing:
+
+- ingestion run ID;
+- page number;
+- source offset;
+- requested page size;
+- record count;
+- source total count;
+- payload size in bytes;
+- SHA-256 digest;
+- request ID;
+- source URL;
+- HTTP status;
+- request attempt count;
+- manifest timestamp.
+
+The page-manifest service persists and commits this metadata before releasing a page
+through its manifesting iterator.
+
+Controlled tests showed that identical byte payloads produce identical SHA-256 digests.
+
+A byte-level modification produces a different digest and fails manifest verification.
+
+The live proof additionally re-downloads the same World Bank page twice and compares
+the resulting raw-byte checksums when the source content is unchanged.
+
+### Nearest related-work bucket
+
+- data provenance
+- reproducible data acquisition
+- content-addressed data identity
+- integrity verification
+- raw-data lineage
+- immutable-source manifests
+
+### Validity threat
+
+SHA-256 establishes byte-level identity, not semantic equivalence or source
+authenticity.
+
+Two JSON responses containing semantically equivalent values may produce different
+checksums if whitespace, ordering or serialization changes.
+
+Conversely, possession of a valid checksum does not prove that the World Bank was the
+party that produced the bytes.
+
+The Day 11 manifest also does not yet mean that the corresponding raw payload is
+durably retained. A manifest could exist while the in-memory/raw response bytes have
+not yet reached durable raw storage.
+
+Therefore the manifest must not be interpreted as a durable crash/resume checkpoint.
+
+### Mitigation / follow-up
+
+The checksum definition is intentionally documented as SHA-256 of exact response bytes
+rather than canonicalized JSON.
+
+Later raw landing will store the unchanged payload together with this checksum and run
+lineage.
+
+Idempotent raw landing will use deterministic source identity and checksum evidence.
+
+Durable checkpoint advancement will occur only after the corresponding raw page has
+been successfully persisted.
+
+Archive manifests will later verify that retained historical raw artifacts still match
+their original checksums.
