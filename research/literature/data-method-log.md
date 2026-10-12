@@ -554,3 +554,22 @@ Business-level quality rules remain separate from source-type parsing.
 
 Persistent quarantine and remediation state will later allow corrected parsers to
 reprocess rejected records without re-fetching the source.
+
+
+## Day 13 — Failure injection and fail-closed ingestion policy
+
+### Assumption
+
+A reproducible research data platform must make failure semantics explicit rather than
+assuming that successful-path unit tests imply reliable ingestion.
+
+Transient transport failures, malformed source responses, invalid records, duplicate
+source pages and persistence failures represent different failure classes and therefore
+must not all receive the same recovery policy.
+
+The intended policy is:
+
+```text
+transient transport fault -> bounded retry
+record-level schema fault -> quarantine
+invalid response / duplicate / persistence failure -> fail closed
