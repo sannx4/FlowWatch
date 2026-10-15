@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from copy import deepcopy
 from datetime import UTC, datetime
-from typing import Any, Self
+from typing import Any, Self, TypeGuard
 from uuid import UUID
 
 from pydantic import (
@@ -14,12 +14,24 @@ from pydantic import (
     model_validator,
 )
 
+from src.ingestion.raw_checksum import (
+    checksum_record,
+)
+from src.ingestion.source_keys import (
+    build_page_source_key,
+    build_record_source_key,
+)
+
 DEFAULT_PARSER_VERSION = (
     "worldbank-source-v1"
 )
 
 _SHA256_PATTERN = (
     r"^[0-9a-f]{64}$"
+)
+
+_HEX_CHARS = frozenset(
+    "0123456789abcdef"
 )
 
 
@@ -42,14 +54,133 @@ def _as_utc(
     )
 
 
+def _is_sha256_hex(
+    value: Any,
+) -> TypeGuard[str]:
+    """
+    Return True only when value is a lowercase
+    64-character SHA-256 hexadecimal digest.
+
+    TypeGuard also tells mypy that a successful
+    check guarantees value is str.
+    """
+
+    if not isinstance(
+        value,
+        str,
+    ):
+        return False
+
+    if len(
+        value
+    ) != 64:
+        return False
+
+    return all(
+        character
+        in _HEX_CHARS
+        for character in value
+    )
+
+
+def _populate_page_source_key(
+    value: Mapping[
+        str,
+        Any,
+    ],
+) -> dict[str, Any]:
+    """
+    Generate page_source_key when it is absent.
+
+    Invalid supplied values are not silently corrected.
+    They remain available for Pydantic validation.
+
+    This also allows legacy Day-15 documents that did not
+    yet contain page_source_key to be reconstructed.
+    """
+
+    data = dict(
+        value
+    )
+
+    if (
+        "page_source_key"
+        in data
+        and data[
+            "page_source_key"
+        ]
+        is not None
+    ):
+        return data
+
+    dataset_id = data.get(
+        "dataset_id"
+    )
+
+    resource_id = data.get(
+        "resource_id"
+    )
+
+    page_offset = data.get(
+        "page_offset"
+    )
+
+    source_checksum = data.get(
+        "source_checksum"
+    )
+
+    if (
+        isinstance(
+            dataset_id,
+            str,
+        )
+        and bool(
+            dataset_id
+        )
+        and isinstance(
+            resource_id,
+            str,
+        )
+        and bool(
+            resource_id
+        )
+        and isinstance(
+            page_offset,
+            int,
+        )
+        and page_offset >= 0
+        and _is_sha256_hex(
+            source_checksum
+        )
+    ):
+        data[
+            "page_source_key"
+        ] = build_page_source_key(
+            dataset_id=(
+                dataset_id
+            ),
+            resource_id=(
+                resource_id
+            ),
+            page_offset=(
+                page_offset
+            ),
+            source_checksum=(
+                source_checksum
+            ),
+        )
+
+    return data
+
+
 class MongoDocumentModel(
     BaseModel
 ):
     """
     Base model for FlowWatch MongoDB documents.
 
-    MongoDB stores run UUIDs as strings so client UUID
-    representation settings cannot silently alter lineage keys.
+    MongoDB stores run UUIDs as strings so UUID representation
+    settings cannot silently alter lineage identifiers.
     """
 
     model_config = ConfigDict(
@@ -108,7 +239,10 @@ class RawEnvelopeBase(
     """
     Metadata shared by raw page and raw-record envelopes.
 
-    The payload is not transformed by this layer.
+    The raw payload is never transformed by this layer.
+
+    page_source_key identifies a logical raw page version
+    independently of ingestion execution identity.
     """
 
     envelope_version: int = Field(
@@ -145,6 +279,29 @@ class RawEnvelopeBase(
         pattern=_SHA256_PATTERN
     )
 
+    page_source_key: str = Field(
+        default="",
+        min_length=1,
+    )
+
+    @model_validator(
+        mode="before"
+    )
+    @classmethod
+    def populate_page_source_key(
+        cls,
+        value: Any,
+    ) -> Any:
+        if not isinstance(
+            value,
+            Mapping,
+        ):
+            return value
+
+        return _populate_page_source_key(
+            value
+        )
+
     @field_validator(
         "retrieved_at"
     )
@@ -160,6 +317,41 @@ class RawEnvelopeBase(
             ),
         )
 
+    @model_validator(
+        mode="after"
+    )
+    def validate_page_source_key(
+        self,
+    ) -> Self:
+        expected_key = (
+            build_page_source_key(
+                dataset_id=(
+                    self.dataset_id
+                ),
+                resource_id=(
+                    self.resource_id
+                ),
+                page_offset=(
+                    self.page_offset
+                ),
+                source_checksum=(
+                    self.source_checksum
+                ),
+            )
+        )
+
+        if (
+            self.page_source_key
+            != expected_key
+        ):
+            raise ValueError(
+                "page_source_key does not "
+                "match the deterministic "
+                "source-page identity"
+            )
+
+        return self
+
 
 class RawPageEnvelope(
     RawEnvelopeBase
@@ -167,10 +359,10 @@ class RawPageEnvelope(
     """
     Exact raw-page lineage envelope.
 
-    `raw_bytes` preserves the exact HTTP response bytes used
-    to calculate the page checksum.
+    raw_bytes preserves the exact HTTP response bytes used
+    to calculate source_checksum.
 
-    `payload` preserves the decoded JSON object without
+    payload preserves the decoded source JSON without
     business transformation.
     """
 
@@ -208,7 +400,12 @@ class RawRecordEnvelope(
     One source record with raw payload and lineage metadata.
 
     credit_number and end_of_period are query projections only.
-    The original source object remains unchanged in `payload`.
+    The original source object remains unchanged in payload.
+
+    record_checksum identifies canonical logical record content.
+
+    source_record_key provides deterministic Day-16 raw-record
+    identity for idempotent MongoDB landing.
     """
 
     record_index: int = Field(
@@ -219,16 +416,159 @@ class RawRecordEnvelope(
         ge=0
     )
 
-    credit_number: str | None = None
+    record_checksum: str = Field(
+        default="",
+        pattern=_SHA256_PATTERN,
+    )
 
-    end_of_period: str | None = None
+    source_record_key: str = Field(
+        default="",
+        min_length=1,
+    )
+
+    credit_number: (
+        str
+        | None
+    ) = None
+
+    end_of_period: (
+        str
+        | None
+    ) = None
 
     payload: Any
 
     @model_validator(
+        mode="before"
+    )
+    @classmethod
+    def populate_record_identity(
+        cls,
+        value: Any,
+    ) -> Any:
+        if not isinstance(
+            value,
+            Mapping,
+        ):
+            return value
+
+        data = (
+            _populate_page_source_key(
+                value
+            )
+        )
+
+        payload_present = (
+            "payload"
+            in data
+        )
+
+        if (
+            (
+                "record_checksum"
+                not in data
+                or data[
+                    "record_checksum"
+                ]
+                is None
+            )
+            and payload_present
+        ):
+            data[
+                "record_checksum"
+            ] = checksum_record(
+                data.get(
+                    "payload"
+                )
+            )
+
+        dataset_id = data.get(
+            "dataset_id"
+        )
+
+        resource_id = data.get(
+            "resource_id"
+        )
+
+        page_source_key = data.get(
+            "page_source_key"
+        )
+
+        record_index = data.get(
+            "record_index"
+        )
+
+        record_checksum = data.get(
+            "record_checksum"
+        )
+
+        source_record_key_missing = (
+            "source_record_key"
+            not in data
+            or data[
+                "source_record_key"
+            ]
+            is None
+        )
+
+        if (
+            source_record_key_missing
+            and isinstance(
+                dataset_id,
+                str,
+            )
+            and bool(
+                dataset_id
+            )
+            and isinstance(
+                resource_id,
+                str,
+            )
+            and bool(
+                resource_id
+            )
+            and isinstance(
+                page_source_key,
+                str,
+            )
+            and bool(
+                page_source_key
+            )
+            and isinstance(
+                record_index,
+                int,
+            )
+            and record_index >= 0
+            and _is_sha256_hex(
+                record_checksum
+            )
+        ):
+            data[
+                "source_record_key"
+            ] = build_record_source_key(
+                dataset_id=(
+                    dataset_id
+                ),
+                resource_id=(
+                    resource_id
+                ),
+                page_source_key=(
+                    page_source_key
+                ),
+                record_index=(
+                    record_index
+                ),
+                record_checksum=(
+                    record_checksum
+                ),
+            )
+
+        return data
+
+    @model_validator(
         mode="after"
     )
-    def validate_source_offset(
+    def validate_record_identity(
         self,
     ) -> Self:
         expected_offset = (
@@ -244,6 +584,53 @@ class RawRecordEnvelope(
                 "source_record_offset must "
                 "equal page_offset + "
                 "record_index"
+            )
+
+        expected_checksum = (
+            checksum_record(
+                self.payload
+            )
+        )
+
+        if (
+            self.record_checksum
+            != expected_checksum
+        ):
+            raise ValueError(
+                "record_checksum does not "
+                "match the deterministic "
+                "source-record payload "
+                "checksum"
+            )
+
+        expected_source_key = (
+            build_record_source_key(
+                dataset_id=(
+                    self.dataset_id
+                ),
+                resource_id=(
+                    self.resource_id
+                ),
+                page_source_key=(
+                    self.page_source_key
+                ),
+                record_index=(
+                    self.record_index
+                ),
+                record_checksum=(
+                    self.record_checksum
+                ),
+            )
+        )
+
+        if (
+            self.source_record_key
+            != expected_source_key
+        ):
+            raise ValueError(
+                "source_record_key does not "
+                "match the deterministic "
+                "source-record identity"
             )
 
         return self
@@ -265,6 +652,16 @@ class RawRecordEnvelope(
             DEFAULT_PARSER_VERSION
         ),
     ) -> Self:
+        """
+        Build an envelope from an unchanged source record.
+
+        Deterministic Day-16 lineage fields are generated by
+        Pydantic model validators rather than this factory.
+
+        This keeps malformed source metadata inside Pydantic's
+        validation path.
+        """
+
         credit_number: (
             str
             | None
@@ -309,8 +706,12 @@ class RawRecordEnvelope(
 
         return cls(
             run_id=run_id,
-            dataset_id=dataset_id,
-            resource_id=resource_id,
+            dataset_id=(
+                dataset_id
+            ),
+            resource_id=(
+                resource_id
+            ),
             parser_version=(
                 parser_version
             ),
@@ -356,8 +757,8 @@ class RawIngestionRunReference(
     """
     MongoDB reference to the authoritative ingestion-run identity.
 
-    PostgreSQL remains authoritative for the run lifecycle.
-    This Mongo document provides raw-lineage lookup context.
+    PostgreSQL remains authoritative for ingestion-run lifecycle.
+    This document supplies raw-lineage lookup context.
     """
 
     envelope_version: int = Field(
