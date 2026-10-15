@@ -605,3 +605,48 @@ Local Day-14 evidence currently consists of:
 72 full-suite tests passed
 83% ingestion + validation coverage
 mypy clean across 13 source files
+
+## Day 15 — MongoDB raw collections and envelopes
+
+### Assumption
+
+Later empirical results are reproducible only if each processed source record
+can be traced to the raw source evidence, source identifiers, and ingestion run
+that produced it.
+
+The raw storage layer must preserve source values before business parsing or
+normalization.
+
+### Observation
+
+FlowWatch now defines explicit MongoDB raw-lineage contracts for:
+
+- `raw_pages`
+- `raw_records`
+- `ingestion_runs`
+
+Raw pages preserve:
+
+- exact HTTP response bytes
+- decoded source payload
+- SHA-256 checksum
+- retrieval timestamp
+- ingestion run ID
+- dataset ID
+- resource ID
+- page number and offset
+- parser version
+
+Raw records preserve the original source payload unchanged while duplicating
+only the minimum source-identity fields required for indexed retrieval:
+
+- `credit_number`
+- `end_of_period`
+
+The compound source-identity index is:
+
+```text
+dataset_id
+resource_id
+credit_number
+end_of_period
