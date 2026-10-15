@@ -32,6 +32,10 @@ RAW_PAGE_CHECKSUM_INDEX: Final[
     str
 ] = "ix_raw_pages_checksum"
 
+RAW_PAGE_SOURCE_KEY_INDEX: Final[
+    str
+] = "ux_raw_pages_run_source_key"
+
 
 RAW_RECORD_RUN_INDEX: Final[
     str
@@ -44,6 +48,10 @@ RAW_RECORD_SOURCE_IDENTITY_INDEX: Final[
 RAW_RECORD_CREDIT_PERIOD_INDEX: Final[
     str
 ] = "ix_raw_records_credit_period"
+
+RAW_RECORD_SOURCE_KEY_INDEX: Final[
+    str
+] = "ux_raw_records_run_source_key"
 
 
 INGESTION_RUN_ID_INDEX: Final[
@@ -112,6 +120,30 @@ RAW_PAGE_INDEXES: Final[
             RAW_PAGE_CHECKSUM_INDEX
         ),
     ),
+    IndexModel(
+        [
+            (
+                "run_id",
+                ASCENDING,
+            ),
+            (
+                "page_source_key",
+                ASCENDING,
+            ),
+        ],
+        name=(
+            RAW_PAGE_SOURCE_KEY_INDEX
+        ),
+        unique=True,
+        partialFilterExpression={
+            "run_id": {
+                "$type": "string"
+            },
+            "page_source_key": {
+                "$type": "string"
+            },
+        },
+    ),
 )
 
 
@@ -174,6 +206,30 @@ RAW_RECORD_INDEXES: Final[
         name=(
             RAW_RECORD_CREDIT_PERIOD_INDEX
         ),
+    ),
+    IndexModel(
+        [
+            (
+                "run_id",
+                ASCENDING,
+            ),
+            (
+                "source_record_key",
+                ASCENDING,
+            ),
+        ],
+        name=(
+            RAW_RECORD_SOURCE_KEY_INDEX
+        ),
+        unique=True,
+        partialFilterExpression={
+            "run_id": {
+                "$type": "string"
+            },
+            "source_record_key": {
+                "$type": "string"
+            },
+        },
     ),
 )
 
@@ -247,10 +303,28 @@ def ensure_raw_indexes(
     list[str],
 ]:
     """
-    Create all Day-15 raw-lineage indexes.
+    Create all raw-lineage indexes required by
+    Day 15 and Day 16.
 
-    MongoDB createIndexes is idempotent when the same
-    named index definition already exists.
+    Day 15:
+    - run lookup
+    - source lookup
+    - checksum lookup
+    - credit/reporting-period lookup
+
+    Day 16:
+    - unique run + deterministic page identity
+    - unique run + deterministic record identity
+
+    The deterministic source keys themselves remain stable
+    across runs.
+
+    run_id is included in the unique index so the same source
+    object may be observed by multiple ingestion runs while a
+    retry inside the same run remains idempotent.
+
+    Partial unique indexes allow legacy Day-15 documents
+    without Day-16 keys to coexist.
     """
 
     ensure_raw_collections(

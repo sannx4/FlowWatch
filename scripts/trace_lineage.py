@@ -1,231 +1,382 @@
 from __future__ import annotations
 
-import hashlib
+import argparse
+import json
 import os
+from datetime import date
+from typing import Any
 
 from dotenv import load_dotenv
-from pymongo import MongoClient
-from sqlalchemy import URL, create_engine, text
+from sqlalchemy import (
+    URL,
+    create_engine,
+    select,
+)
 
-from src.transformation.day07 import (
-    parse_source_date,
-    record_checksum,
+from src.db.models import (
+    Credit,
+    CreditSnapshot,
+)
+from src.ingestion.mongodb_connection import (
+    create_mongodb_client,
+    load_mongodb_config,
+)
+from src.ingestion.mongodb_indexes import (
+    RAW_RECORDS_COLLECTION,
 )
 
 
 def build_postgres_engine():
-    return create_engine(
-        URL.create(
-            drivername="postgresql+psycopg",
-            username=os.environ["POSTGRES_USER"],
-            password=os.environ["POSTGRES_PASSWORD"],
-            host=os.getenv(
-                "POSTGRES_HOST",
-                "localhost",
-            ),
-            port=int(
-                os.getenv(
-                    "POSTGRES_PORT",
-                    "5434",
-                )
-            ),
-            database=os.environ["POSTGRES_DB"],
-        )
-    )
+    """
+    Create the PostgreSQL engine using the existing
+    FlowWatch environment configuration.
+    """
 
+    load_dotenv()
 
-def build_mongo_client() -> MongoClient:
-    return MongoClient(
+    url = URL.create(
+        drivername="postgresql+psycopg",
+        username=os.environ[
+            "POSTGRES_USER"
+        ],
+        password=os.environ[
+            "POSTGRES_PASSWORD"
+        ],
         host=os.getenv(
-            "MONGO_HOST",
+            "POSTGRES_HOST",
             "localhost",
         ),
         port=int(
             os.getenv(
-                "MONGO_PORT",
-                "27018",
+                "POSTGRES_PORT",
+                "5434",
             )
         ),
-        username=os.environ[
-            "MONGO_INITDB_ROOT_USERNAME"
+        database=os.environ[
+            "POSTGRES_DB"
         ],
-        password=os.environ[
-            "MONGO_INITDB_ROOT_PASSWORD"
-        ],
-        authSource="admin",
-        serverSelectionTimeoutMS=5000,
+    )
+
+    return create_engine(
+        url
     )
 
 
-def main() -> None:
-    load_dotenv()
+def _json_safe_document(
+    document: dict[
+        str,
+        Any,
+    ],
+) -> dict[
+    str,
+    Any,
+]:
+    """
+    Convert Mongo-specific values such as ObjectId into
+    printable values without modifying the stored document.
+    """
 
-    postgres = build_postgres_engine()
-    mongo = build_mongo_client()
+    result = dict(
+        document
+    )
+
+    if "_id" in result:
+        result[
+            "_id"
+        ] = str(
+            result[
+                "_id"
+            ]
+        )
+
+    return result
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Trace one PostgreSQL credit snapshot "
+            "back to its exact MongoDB raw source record."
+        )
+    )
+
+    parser.add_argument(
+        "--credit-number",
+        required=True,
+        help=(
+            "Credit number stored in PostgreSQL."
+        ),
+    )
+
+    parser.add_argument(
+        "--end-of-period",
+        required=True,
+        help=(
+            "Reporting period in YYYY-MM-DD format."
+        ),
+    )
+
+    args = parser.parse_args()
+
+    try:
+        period = date.fromisoformat(
+            args.end_of_period
+        )
+    except ValueError:
+        print(
+            "ERROR: --end-of-period must "
+            "use YYYY-MM-DD format."
+        )
+        return 2
+
+    postgres = (
+        build_postgres_engine()
+    )
+
+    mongo_config = (
+        load_mongodb_config()
+    )
+
+    mongo_client = (
+        create_mongodb_client(
+            mongo_config
+        )
+    )
 
     try:
         with postgres.connect() as connection:
-            row = connection.execute(
-                text(
-                    """
-                    SELECT
-                        c.credit_number,
-                        cs.end_of_period,
-                        cs.ingestion_run_id::text
-                            AS run_id,
-                        cs.source_record_key,
-                        cs.source_checksum
-                    FROM credit_snapshots cs
-                    JOIN credits c
-                      ON c.credit_id = cs.credit_id
-                    WHERE cs.ingestion_run_id IS NOT NULL
-                      AND cs.source_record_key IS NOT NULL
-                      AND cs.source_checksum IS NOT NULL
-                    ORDER BY cs.end_of_period
-                    LIMIT 1
-                    """
-                )
-            ).mappings().one()
+            row = (
+                connection.execute(
+                    select(
+                        CreditSnapshot
+                        .__table__
+                        .c
+                        .credit_snapshot_id
+                        .label(
+                            "credit_snapshot_id"
+                        ),
+                        Credit
+                        .__table__
+                        .c
+                        .credit_number
+                        .label(
+                            "credit_number"
+                        ),
+                        CreditSnapshot
+                        .__table__
+                        .c
+                        .end_of_period
+                        .label(
+                            "end_of_period"
+                        ),
+                        CreditSnapshot
+                        .__table__
+                        .c
+                        .ingestion_run_id
+                        .label(
+                            "ingestion_run_id"
+                        ),
+                        CreditSnapshot
+                        .__table__
+                        .c
+                        .source_checksum
+                        .label(
+                            "source_checksum"
+                        ),
+                        CreditSnapshot
+                        .__table__
+                        .c
+                        .source_record_key
+                        .label(
+                            "source_record_key"
+                        ),
+                    )
+                    .join(
+                        Credit.__table__,
+                        (
+                            CreditSnapshot
+                            .__table__
+                            .c
+                            .credit_id
+                            == Credit
+                            .__table__
+                            .c
+                            .credit_id
+                        ),
+                    )
+                    .where(
+                        Credit
+                        .__table__
+                        .c
+                        .credit_number
+                        == args.credit_number,
+                        CreditSnapshot
+                        .__table__
+                        .c
+                        .end_of_period
+                        == period,
+                    )
+                ).one_or_none()
+            )
 
-        database = mongo[
-            os.environ["MONGO_INITDB_DATABASE"]
+        if row is None:
+            print(
+                "LINEAGE STATUS: NOT FOUND"
+            )
+
+            print(
+                "No PostgreSQL snapshot matched "
+                f"{args.credit_number} / "
+                f"{period.isoformat()}."
+            )
+
+            return 3
+
+        if (
+            row.ingestion_run_id
+            is None
+            or row.source_checksum
+            is None
+            or row.source_record_key
+            is None
+        ):
+            print(
+                "LINEAGE STATUS: INCOMPLETE"
+            )
+
+            print(
+                "The PostgreSQL snapshot exists "
+                "but its Day-16 lineage fields "
+                "are incomplete."
+            )
+
+            return 4
+
+        mongo_database = mongo_client[
+            mongo_config.database_name
         ]
 
-        raw_record = database[
-            "day07_raw_records"
+        raw_document = mongo_database[
+            RAW_RECORDS_COLLECTION
         ].find_one(
             {
-                "run_id": row["run_id"],
+                "run_id": str(
+                    row.ingestion_run_id
+                ),
                 "source_record_key": (
-                    row["source_record_key"]
+                    row.source_record_key
                 ),
             }
         )
 
-        if raw_record is None:
-            raise RuntimeError(
-                "Matching Mongo raw record not found."
+        if raw_document is None:
+            print(
+                "LINEAGE STATUS: BROKEN"
             )
 
-        payload = raw_record["payload"]
-
-        calculated_checksum = record_checksum(
-            payload
-        )
-
-        if calculated_checksum != row["source_checksum"]:
-            raise RuntimeError(
-                "Record checksum mismatch."
+            print(
+                "PostgreSQL lineage exists, but "
+                "the corresponding Mongo raw "
+                "record was not found."
             )
 
-        if (
-            payload["credit_number"]
-            != row["credit_number"]
-        ):
-            raise RuntimeError(
-                "Credit number mismatch."
+            return 5
+
+        run_matches = (
+            raw_document.get(
+                "run_id"
             )
-
-        if (
-            parse_source_date(
-                payload["end_of_period"]
+            == str(
+                row.ingestion_run_id
             )
-            != row["end_of_period"]
-        ):
-            raise RuntimeError(
-                "end_of_period mismatch."
+        )
+
+        checksum_matches = (
+            raw_document.get(
+                "source_checksum"
             )
-
-        raw_payload = database[
-            "day07_raw_payloads"
-        ].find_one(
-            {
-                "_id": raw_record[
-                    "source_file_checksum"
-                ]
-            }
+            == row.source_checksum
         )
 
-        if raw_payload is None:
-            raise RuntimeError(
-                "Exact raw payload not found."
+        key_matches = (
+            raw_document.get(
+                "source_record_key"
             )
-
-        stored_bytes = bytes(
-            raw_payload["raw_bytes"]
+            == row.source_record_key
         )
 
-        stored_file_checksum = hashlib.sha256(
-            stored_bytes
-        ).hexdigest()
+        lineage_matches = (
+            run_matches
+            and checksum_matches
+            and key_matches
+        )
 
-        if (
-            stored_file_checksum
-            != raw_record["source_file_checksum"]
-        ):
-            raise RuntimeError(
-                "Raw file checksum mismatch."
+        result = {
+            "lineage_status": (
+                "MATCH"
+                if lineage_matches
+                else "MISMATCH"
+            ),
+            "postgres_snapshot": {
+                "credit_snapshot_id": (
+                    row.credit_snapshot_id
+                ),
+                "credit_number": (
+                    row.credit_number
+                ),
+                "end_of_period": (
+                    row
+                    .end_of_period
+                    .isoformat()
+                ),
+                "ingestion_run_id": str(
+                    row.ingestion_run_id
+                ),
+                "source_checksum": (
+                    row.source_checksum
+                ),
+                "source_record_key": (
+                    row.source_record_key
+                ),
+            },
+            "checks": {
+                "run_id_match": (
+                    run_matches
+                ),
+                "source_checksum_match": (
+                    checksum_matches
+                ),
+                "source_record_key_match": (
+                    key_matches
+                ),
+            },
+            "mongo_raw_record": (
+                _json_safe_document(
+                    raw_document
+                )
+            ),
+        }
+
+        print(
+            json.dumps(
+                result,
+                indent=2,
+                default=str,
             )
-
-        print()
-        print("DAY 7 LINEAGE VERIFIED")
-        print("----------------------")
-
-        print(
-            f"credit_number="
-            f"{row['credit_number']}"
         )
 
-        print(
-            f"end_of_period="
-            f"{row['end_of_period']}"
-        )
+        if not lineage_matches:
+            return 6
 
-        print(
-            f"run_id="
-            f"{row['run_id']}"
-        )
-
-        print(
-            f"source_record_key="
-            f"{row['source_record_key']}"
-        )
-
-        print(
-            f"postgres_source_checksum="
-            f"{row['source_checksum']}"
-        )
-
-        print(
-            f"mongo_source_checksum="
-            f"{raw_record['source_checksum']}"
-        )
-
-        print(
-            f"raw_file_sha256="
-            f"{stored_file_checksum}"
-        )
-
-        print()
-        print(
-            "PostgreSQL -> Mongo raw record: OK"
-        )
-
-        print(
-            "Mongo raw record checksum: OK"
-        )
-
-        print(
-            "Exact raw source bytes checksum: OK"
-        )
-
-        print()
-        print("LINEAGE PROOF: SUCCESS")
+        return 0
 
     finally:
+        mongo_client.close()
+
         postgres.dispose()
-        mongo.close()
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(
+        main()
+    )
