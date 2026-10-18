@@ -1,0 +1,349 @@
+{
+  "inspected_at_utc": "2026-10-18T21:04:06.482133+00:00",
+  "inspection_run_id": "25c46942-41ea-41be-9e63-6a3f06d98be6",
+  "inspection_run_id_is_not_a_persisted_ingestion_run": true,
+  "dataset_id": "DS00976",
+  "resource_id": "RS00906",
+  "source_reported_total_count": 1612290,
+  "requested_offsets": [
+    0,
+    100,
+    500,
+    700,
+    2000,
+    5000
+  ],
+  "page_size": 100,
+  "inspected_records": 600,
+  "accepted_records": 600,
+  "rejected_records": 0,
+  "records_with_warnings": 4,
+  "warning_conditions": 7,
+  "warning_rule_counts": {
+    "DQ-AMOUNT-002": 3,
+    "DQ-CROSS-001": 4
+  },
+  "rejection_rule_counts": {},
+  "pages": [
+    {
+      "offset": 0,
+      "source_request_id": "5754cd88-af49-4b7c-a87b-5c5c76894172",
+      "source_url": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=100&skip=0&type=json",
+      "page_sha256": "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0",
+      "records": 100,
+      "accepted": 100,
+      "rejected": 0,
+      "records_with_warnings": 0
+    },
+    {
+      "offset": 100,
+      "source_request_id": "2fc7982b-835a-45f5-b170-4c747783db4b",
+      "source_url": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=100&skip=100&type=json",
+      "page_sha256": "13fe9e9ab9bb4e67b0e6a1a4cc9cfd1a78e26fe29d52b3c1d835831244771181",
+      "records": 100,
+      "accepted": 100,
+      "rejected": 0,
+      "records_with_warnings": 1
+    },
+    {
+      "offset": 500,
+      "source_request_id": "0b24fa86-ea9e-4e09-bf64-a20f6f28be69",
+      "source_url": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=100&skip=500&type=json",
+      "page_sha256": "d699dcc3c241b116342008784e63484be28ec9ccce38f73d5c76960fa3845064",
+      "records": 100,
+      "accepted": 100,
+      "rejected": 0,
+      "records_with_warnings": 1
+    },
+    {
+      "offset": 700,
+      "source_request_id": "28010114-2ee3-4c37-b135-b7152189d2c8",
+      "source_url": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=100&skip=700&type=json",
+      "page_sha256": "76cbd19444f83ccc2dba967f15fcfb4eea98b4cdb6c89578974fb55449cc621c",
+      "records": 100,
+      "accepted": 100,
+      "rejected": 0,
+      "records_with_warnings": 1
+    },
+    {
+      "offset": 2000,
+      "source_request_id": "51e3abcc-832d-4b9e-a84e-29493eb95a1b",
+      "source_url": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=100&skip=2000&type=json",
+      "page_sha256": "250bc270d516c344ab9d565586b8b755907ec62efdec1b5fc78f0da8177a88db",
+      "records": 100,
+      "accepted": 100,
+      "rejected": 0,
+      "records_with_warnings": 1
+    },
+    {
+      "offset": 5000,
+      "source_request_id": "6ce08e7e-d3a3-49f8-9b06-693769128a38",
+      "source_url": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=100&skip=5000&type=json",
+      "page_sha256": "9a9462c85331fbef8f5aab96c669f893fc2eb4f0c4226e0e955000b5a7639ac6",
+      "records": 100,
+      "accepted": 100,
+      "rejected": 0,
+      "records_with_warnings": 0
+    }
+  ],
+  "rejections_with_raw_lineage": [],
+  "warnings_with_raw_lineage": [
+    {
+      "run_id": "25c46942-41ea-41be-9e63-6a3f06d98be6",
+      "page_number": 2,
+      "page_offset": 100,
+      "record_index": 95,
+      "source_record_offset": 195,
+      "source_checksum": "13fe9e9ab9bb4e67b0e6a1a4cc9cfd1a78e26fe29d52b3c1d835831244771181",
+      "credit_number": "IDA00060",
+      "end_of_period": "2016-10-31",
+      "raw_record": {
+        "agreement_signing_date": "30-Aug-1961",
+        "board_approval_date": "29-Aug-1961",
+        "borrower": "MINISTRY OF FINANCE",
+        "borrowers_obligation_us_": 0,
+        "board_approval___fiscal_year": 1962,
+        "board_approval___calendar_year": 1961,
+        "cancelled_amount_us_": 21731.53,
+        "closed_date_most_recent": "30-Jun-1965",
+        "country": "Taiwan, China",
+        "country_code": "TW",
+        "credit_number": "IDA00060",
+        "credit_status": "Fully Repaid",
+        "credits_held_us_": 0,
+        "currency_of_commitment": "USD",
+        "disbursed_amount_us_": 2627709.48,
+        "due_3rd_party_us_": 0,
+        "due_to_ida_us_": 0,
+        "effective_date_most_recent": "27-Nov-1961",
+        "end_of_period": "31-Oct-2016",
+        "exchange_adjustment_us_": "0",
+        "first_repayment_date": "15-Mar-1972",
+        "last_disbursement_date": null,
+        "last_repayment_date": "15-Sep-2011",
+        "original_principal_amount_us_": 2200000,
+        "project_id": "P003658",
+        "project_name": "HARBOR DREDGING",
+        "region": "EAST ASIA AND PACIFIC",
+        "repaid_3rd_party_us_": 0,
+        "repaid_to_ida_us_": 2627709.48,
+        "service_charge_rate": 0.75,
+        "sold_3rd_party_us_": 0,
+        "undisbursed_amount_us_": 0
+      },
+      "warnings": [
+        {
+          "rule_id": "DQ-AMOUNT-002",
+          "field_path": "disbursed_amount_us_,original_principal_amount_us_",
+          "message": "Disbursed amount exceeds original principal; investigate.",
+          "observed_values": {
+            "original_principal_amount_us_": "2200000",
+            "disbursed_amount_us_": "2627709.48"
+          }
+        },
+        {
+          "rule_id": "DQ-CROSS-001",
+          "field_path": "disbursed_amount_us_,undisbursed_amount_us_,cancelled_amount_us_,original_principal_amount_us_",
+          "message": "Financial components differ from original principal; investigate.",
+          "observed_values": {
+            "original_principal_amount_us_": "2200000",
+            "component_sum_usd": "2649441.01",
+            "difference_usd": "449441.01"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "25c46942-41ea-41be-9e63-6a3f06d98be6",
+      "page_number": 6,
+      "page_offset": 500,
+      "record_index": 47,
+      "source_record_offset": 547,
+      "source_checksum": "d699dcc3c241b116342008784e63484be28ec9ccce38f73d5c76960fa3845064",
+      "credit_number": "IDA00160",
+      "end_of_period": "2016-10-31",
+      "raw_record": {
+        "agreement_signing_date": "22-Nov-1961",
+        "board_approval_date": "21-Nov-1961",
+        "borrower": "Ministry of Finance and Economic Affairs",
+        "borrowers_obligation_us_": 0,
+        "board_approval___fiscal_year": 1962,
+        "board_approval___calendar_year": 1961,
+        "cancelled_amount_us_": 1654215.55,
+        "closed_date_most_recent": "31-Dec-1966",
+        "country": "Pakistan",
+        "country_code": "PK",
+        "credit_number": "IDA00160",
+        "credit_status": "Fully Repaid",
+        "credits_held_us_": 0,
+        "currency_of_commitment": "USD",
+        "disbursed_amount_us_": 412853.42,
+        "due_3rd_party_us_": 0,
+        "due_to_ida_us_": 0,
+        "effective_date_most_recent": "21-Aug-1962",
+        "end_of_period": "31-Oct-2016",
+        "exchange_adjustment_us_": "0",
+        "first_repayment_date": "01-Apr-1972",
+        "last_disbursement_date": null,
+        "last_repayment_date": "01-Oct-2011",
+        "original_principal_amount_us_": 2000000,
+        "project_id": "P009336",
+        "project_name": "INLAND PORTS PROJECT",
+        "region": "SOUTH ASIA",
+        "repaid_3rd_party_us_": 0,
+        "repaid_to_ida_us_": 412853.42,
+        "service_charge_rate": 0.75,
+        "sold_3rd_party_us_": 0,
+        "undisbursed_amount_us_": 0
+      },
+      "warnings": [
+        {
+          "rule_id": "DQ-CROSS-001",
+          "field_path": "disbursed_amount_us_,undisbursed_amount_us_,cancelled_amount_us_,original_principal_amount_us_",
+          "message": "Financial components differ from original principal; investigate.",
+          "observed_values": {
+            "original_principal_amount_us_": "2000000",
+            "component_sum_usd": "2067068.97",
+            "difference_usd": "67068.97"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "25c46942-41ea-41be-9e63-6a3f06d98be6",
+      "page_number": 8,
+      "page_offset": 700,
+      "record_index": 47,
+      "source_record_offset": 747,
+      "source_checksum": "76cbd19444f83ccc2dba967f15fcfb4eea98b4cdb6c89578974fb55449cc621c",
+      "credit_number": "IDA00210",
+      "end_of_period": "2016-10-31",
+      "raw_record": {
+        "agreement_signing_date": "29-Jun-1962",
+        "board_approval_date": "29-Jun-1962",
+        "borrower": "CONTROLLER OF AID ACCOUNTS & AUDIT",
+        "borrowers_obligation_us_": 0,
+        "board_approval___fiscal_year": 1962,
+        "board_approval___calendar_year": 1962,
+        "cancelled_amount_us_": 0,
+        "closed_date_most_recent": "31-Dec-1967",
+        "country": "India",
+        "country_code": "IN",
+        "credit_number": "IDA00210",
+        "credit_status": "Fully Repaid",
+        "credits_held_us_": 0,
+        "currency_of_commitment": "USD",
+        "disbursed_amount_us_": 18086117.32,
+        "due_3rd_party_us_": 0,
+        "due_to_ida_us_": 0,
+        "effective_date_most_recent": "23-Oct-1962",
+        "end_of_period": "31-Oct-2016",
+        "exchange_adjustment_us_": "0",
+        "first_repayment_date": "01-Jan-1973",
+        "last_disbursement_date": null,
+        "last_repayment_date": "01-Jul-2012",
+        "original_principal_amount_us_": 15000000,
+        "project_id": "P009616",
+        "project_name": "SONE IRRIGATION",
+        "region": "SOUTH ASIA",
+        "repaid_3rd_party_us_": 0,
+        "repaid_to_ida_us_": 18086117.32,
+        "service_charge_rate": 0.75,
+        "sold_3rd_party_us_": 0,
+        "undisbursed_amount_us_": 0
+      },
+      "warnings": [
+        {
+          "rule_id": "DQ-AMOUNT-002",
+          "field_path": "disbursed_amount_us_,original_principal_amount_us_",
+          "message": "Disbursed amount exceeds original principal; investigate.",
+          "observed_values": {
+            "original_principal_amount_us_": "15000000",
+            "disbursed_amount_us_": "18086117.32"
+          }
+        },
+        {
+          "rule_id": "DQ-CROSS-001",
+          "field_path": "disbursed_amount_us_,undisbursed_amount_us_,cancelled_amount_us_,original_principal_amount_us_",
+          "message": "Financial components differ from original principal; investigate.",
+          "observed_values": {
+            "original_principal_amount_us_": "15000000",
+            "component_sum_usd": "18086117.32",
+            "difference_usd": "3086117.32"
+          }
+        }
+      ]
+    },
+    {
+      "run_id": "25c46942-41ea-41be-9e63-6a3f06d98be6",
+      "page_number": 21,
+      "page_offset": 2000,
+      "record_index": 3,
+      "source_record_offset": 2003,
+      "source_checksum": "250bc270d516c344ab9d565586b8b755907ec62efdec1b5fc78f0da8177a88db",
+      "credit_number": "IDA00610",
+      "end_of_period": "2016-10-31",
+      "raw_record": {
+        "agreement_signing_date": "24-Jul-1964",
+        "board_approval_date": "21-Jul-1964",
+        "borrower": "MINISTRO DE ECONOMIA Y",
+        "borrowers_obligation_us_": 0,
+        "board_approval___fiscal_year": 1965,
+        "board_approval___calendar_year": 1964,
+        "cancelled_amount_us_": 0,
+        "closed_date_most_recent": "31-Oct-1970",
+        "country": "Bolivia",
+        "country_code": "BO",
+        "credit_number": "IDA00610",
+        "credit_status": "Fully Repaid",
+        "credits_held_us_": 0,
+        "currency_of_commitment": "USD",
+        "disbursed_amount_us_": 12063443.31,
+        "due_3rd_party_us_": 0,
+        "due_to_ida_us_": 0,
+        "effective_date_most_recent": "25-Aug-1964",
+        "end_of_period": "31-Oct-2016",
+        "exchange_adjustment_us_": "0",
+        "first_repayment_date": "01-Nov-1974",
+        "last_disbursement_date": null,
+        "last_repayment_date": "01-May-2014",
+        "original_principal_amount_us_": 10000000,
+        "project_id": "P006110",
+        "project_name": "ENDE POWER I",
+        "region": "LATIN AMERICA AND CARIBBEAN",
+        "repaid_3rd_party_us_": 0,
+        "repaid_to_ida_us_": 12063443.31,
+        "service_charge_rate": 0.75,
+        "sold_3rd_party_us_": 0,
+        "undisbursed_amount_us_": 0
+      },
+      "warnings": [
+        {
+          "rule_id": "DQ-AMOUNT-002",
+          "field_path": "disbursed_amount_us_,original_principal_amount_us_",
+          "message": "Disbursed amount exceeds original principal; investigate.",
+          "observed_values": {
+            "original_principal_amount_us_": "10000000",
+            "disbursed_amount_us_": "12063443.31"
+          }
+        },
+        {
+          "rule_id": "DQ-CROSS-001",
+          "field_path": "disbursed_amount_us_,undisbursed_amount_us_,cancelled_amount_us_,original_principal_amount_us_",
+          "message": "Financial components differ from original principal; investigate.",
+          "observed_values": {
+            "original_principal_amount_us_": "10000000",
+            "component_sum_usd": "12063443.31",
+            "difference_usd": "2063443.31"
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Only six non-adjacent pages were inspected, not the full dataset.",
+    "Independent live requests are not an atomic upstream snapshot.",
+    "The scanner detects duplicates only within this inspection run.",
+    "Warnings are diagnostic and do not establish accounting errors."
+  ]
+}
