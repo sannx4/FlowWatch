@@ -1,0 +1,285 @@
+{
+  "profiled_at_utc": "2026-10-18T20:52:47.953107+00:00",
+  "dataset_id": "DS00976",
+  "resource_id": "RS00906",
+  "source_reported_total_count": 1612290,
+  "source_pages": [
+    {
+      "offset": 0,
+      "count": 100,
+      "request_id": "a821404c-c2ac-4481-b75f-43db2a921ee9",
+      "page_sha256": "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0"
+    },
+    {
+      "offset": 100,
+      "count": 100,
+      "request_id": "19dcda47-7069-47ca-8406-00f27b118814",
+      "page_sha256": "13fe9e9ab9bb4e67b0e6a1a4cc9cfd1a78e26fe29d52b3c1d835831244771181"
+    },
+    {
+      "offset": 500,
+      "count": 100,
+      "request_id": "3fd489e6-40a5-4300-9caf-e7c8beb0012e",
+      "page_sha256": "d699dcc3c241b116342008784e63484be28ec9ccce38f73d5c76960fa3845064"
+    },
+    {
+      "offset": 700,
+      "count": 100,
+      "request_id": "bcca5365-2d4e-460f-95fd-f959d7b9de14",
+      "page_sha256": "76cbd19444f83ccc2dba967f15fcfb4eea98b4cdb6c89578974fb55449cc621c"
+    },
+    {
+      "offset": 2000,
+      "count": 100,
+      "request_id": "0b1e157a-80fd-4d34-be96-c3676d65a187",
+      "page_sha256": "250bc270d516c344ab9d565586b8b755907ec62efdec1b5fc78f0da8177a88db"
+    },
+    {
+      "offset": 5000,
+      "count": 100,
+      "request_id": "a5ba047d-e3b0-4f36-b1c4-64df6e74e285",
+      "page_sha256": "9a9462c85331fbef8f5aab96c669f893fc2eb4f0c4226e0e955000b5a7639ac6"
+    }
+  ],
+  "source_records_inspected": 600,
+  "records_parsed": 600,
+  "parse_failures": [],
+  "amount_fields": {
+    "borrowers_obligation_us_": {
+      "present": 600,
+      "null": 0,
+      "negative": 0,
+      "zero": 587,
+      "positive": 13,
+      "negative_examples": [],
+      "min": "0",
+      "max": "814282.7"
+    },
+    "cancelled_amount_us_": {
+      "present": 600,
+      "null": 0,
+      "negative": 0,
+      "zero": 300,
+      "positive": 300,
+      "negative_examples": [],
+      "min": "0",
+      "max": "1654215.55"
+    },
+    "credits_held_us_": {
+      "present": 600,
+      "null": 0,
+      "negative": 0,
+      "zero": 587,
+      "positive": 13,
+      "negative_examples": [],
+      "min": "0",
+      "max": "814282.7"
+    },
+    "disbursed_amount_us_": {
+      "present": 600,
+      "null": 0,
+      "negative": 0,
+      "zero": 0,
+      "positive": 600,
+      "negative_examples": [],
+      "min": "412853.42",
+      "max": "18086117.32"
+    },
+    "due_3rd_party_us_": {
+      "present": 600,
+      "null": 0,
+      "negative": 0,
+      "zero": 600,
+      "positive": 0,
+      "negative_examples": [],
+      "min": "0",
+      "max": "0"
+    },
+    "due_to_ida_us_": {
+      "present": 600,
+      "null": 0,
+      "negative": 0,
+      "zero": 587,
+      "positive": 13,
+      "negative_examples": [],
+      "min": "0",
+      "max": "814282.7"
+    },
+    "exchange_adjustment_us_": {
+      "present": 600,
+      "null": 0,
+      "negative": 0,
+      "zero": 600,
+      "positive": 0,
+      "negative_examples": [],
+      "min": "0",
+      "max": "0"
+    },
+    "original_principal_amount_us_": {
+      "present": 600,
+      "null": 0,
+      "negative": 0,
+      "zero": 0,
+      "positive": 600,
+      "negative_examples": [],
+      "min": "1929019.45",
+      "max": "18086117.32"
+    },
+    "repaid_3rd_party_us_": {
+      "present": 600,
+      "null": 0,
+      "negative": 0,
+      "zero": 600,
+      "positive": 0,
+      "negative_examples": [],
+      "min": "0",
+      "max": "0"
+    },
+    "repaid_to_ida_us_": {
+      "present": 600,
+      "null": 0,
+      "negative": 0,
+      "zero": 0,
+      "positive": 600,
+      "negative_examples": [],
+      "min": "412853.42",
+      "max": "18086117.32"
+    },
+    "service_charge_rate": {
+      "present": 600,
+      "null": 0,
+      "negative": 0,
+      "zero": 0,
+      "positive": 600,
+      "negative_examples": [],
+      "min": "0.75",
+      "max": "0.75"
+    },
+    "sold_3rd_party_us_": {
+      "present": 600,
+      "null": 0,
+      "negative": 0,
+      "zero": 600,
+      "positive": 0,
+      "negative_examples": [],
+      "min": "0",
+      "max": "0"
+    },
+    "undisbursed_amount_us_": {
+      "present": 600,
+      "null": 0,
+      "negative": 0,
+      "zero": 600,
+      "positive": 0,
+      "negative_examples": [],
+      "min": "0",
+      "max": "0"
+    }
+  },
+  "null_date_counts": {
+    "agreement_signing_date": 0,
+    "board_approval_date": 0,
+    "closed_date_most_recent": 0,
+    "effective_date_most_recent": 0,
+    "end_of_period": 0,
+    "first_repayment_date": 0,
+    "last_disbursement_date": 600,
+    "last_repayment_date": 0
+  },
+  "date_relation_diagnostics": {
+    "approval_after_signing": {
+      "comparable": 600,
+      "reversed": 0,
+      "examples": []
+    },
+    "first_repayment_after_last_repayment": {
+      "comparable": 600,
+      "reversed": 0,
+      "examples": []
+    },
+    "effective_after_closing": {
+      "comparable": 600,
+      "reversed": 0,
+      "examples": []
+    }
+  },
+  "cross_field_diagnostics": {
+    "disbursed_greater_than_original": {
+      "comparable": 600,
+      "observed": 3,
+      "examples": [
+        {
+          "credit_number": "IDA00060",
+          "end_of_period": "31-Oct-2016",
+          "page_offset": 100,
+          "record_index": 95,
+          "page_sha256": "13fe9e9ab9bb4e67b0e6a1a4cc9cfd1a78e26fe29d52b3c1d835831244771181",
+          "original": "2200000",
+          "disbursed": "2627709.48"
+        },
+        {
+          "credit_number": "IDA00210",
+          "end_of_period": "31-Oct-2016",
+          "page_offset": 700,
+          "record_index": 47,
+          "page_sha256": "76cbd19444f83ccc2dba967f15fcfb4eea98b4cdb6c89578974fb55449cc621c",
+          "original": "15000000",
+          "disbursed": "18086117.32"
+        },
+        {
+          "credit_number": "IDA00610",
+          "end_of_period": "31-Oct-2016",
+          "page_offset": 2000,
+          "record_index": 3,
+          "page_sha256": "250bc270d516c344ab9d565586b8b755907ec62efdec1b5fc78f0da8177a88db",
+          "original": "10000000",
+          "disbursed": "12063443.31"
+        }
+      ]
+    },
+    "sum_disbursed_undisbursed_cancelled_differs_from_original": {
+      "comparable": 600,
+      "observed": 4,
+      "examples": [
+        {
+          "credit_number": "IDA00060",
+          "end_of_period": "31-Oct-2016",
+          "page_offset": 100,
+          "record_index": 95,
+          "page_sha256": "13fe9e9ab9bb4e67b0e6a1a4cc9cfd1a78e26fe29d52b3c1d835831244771181",
+          "difference_usd": "449441.01"
+        },
+        {
+          "credit_number": "IDA00160",
+          "end_of_period": "31-Oct-2016",
+          "page_offset": 500,
+          "record_index": 47,
+          "page_sha256": "d699dcc3c241b116342008784e63484be28ec9ccce38f73d5c76960fa3845064",
+          "difference_usd": "67068.97"
+        },
+        {
+          "credit_number": "IDA00210",
+          "end_of_period": "31-Oct-2016",
+          "page_offset": 700,
+          "record_index": 47,
+          "page_sha256": "76cbd19444f83ccc2dba967f15fcfb4eea98b4cdb6c89578974fb55449cc621c",
+          "difference_usd": "3086117.32"
+        },
+        {
+          "credit_number": "IDA00610",
+          "end_of_period": "31-Oct-2016",
+          "page_offset": 2000,
+          "record_index": 3,
+          "page_sha256": "250bc270d516c344ab9d565586b8b755907ec62efdec1b5fc78f0da8177a88db",
+          "difference_usd": "2063443.31"
+        }
+      ]
+    }
+  },
+  "policy": "Observations only. No new rejection rules enforced.",
+  "limitations": [
+    "Non-adjacent pages are not a representative random sample.",
+    "Date-order diagnostics are not established business constraints.",
+    "Currency and financial-adjustment semantics need source review."
+  ]
+}

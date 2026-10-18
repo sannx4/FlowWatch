@@ -1,0 +1,141 @@
+{
+  "inspected_at_utc": "2026-10-18T20:10:16.298673+00:00",
+  "dataset_id": "DS00976",
+  "resource_id": "RS00906",
+  "source_reported_total_count": 1612290,
+  "sampling_policy": "Explicit non-adjacent top/skip API requests; not a full scan",
+  "page_size": 100,
+  "pages": [
+    {
+      "offset": 0,
+      "requested_top": 100,
+      "record_count": 100,
+      "request_id": "79365aaa-c56d-4f3f-b288-3fdf14ade956",
+      "page_sha256": "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0",
+      "source_url": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=100&skip=0&type=json"
+    },
+    {
+      "offset": 100,
+      "requested_top": 100,
+      "record_count": 100,
+      "request_id": "6497aa7b-917f-41db-be21-aea0eff3616e",
+      "page_sha256": "13fe9e9ab9bb4e67b0e6a1a4cc9cfd1a78e26fe29d52b3c1d835831244771181",
+      "source_url": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=100&skip=100&type=json"
+    },
+    {
+      "offset": 500,
+      "requested_top": 100,
+      "record_count": 100,
+      "request_id": "4c280861-6f88-41fb-ba27-0eb11a3ccfc5",
+      "page_sha256": "d699dcc3c241b116342008784e63484be28ec9ccce38f73d5c76960fa3845064",
+      "source_url": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=100&skip=500&type=json"
+    },
+    {
+      "offset": 700,
+      "requested_top": 100,
+      "record_count": 100,
+      "request_id": "45fbf2c4-0c75-45d4-be23-62f6627b03c0",
+      "page_sha256": "76cbd19444f83ccc2dba967f15fcfb4eea98b4cdb6c89578974fb55449cc621c",
+      "source_url": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=100&skip=700&type=json"
+    },
+    {
+      "offset": 2000,
+      "requested_top": 100,
+      "record_count": 100,
+      "request_id": "9f515fa7-b1de-4288-9e6a-7957011f3cdc",
+      "page_sha256": "250bc270d516c344ab9d565586b8b755907ec62efdec1b5fc78f0da8177a88db",
+      "source_url": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=100&skip=2000&type=json"
+    },
+    {
+      "offset": 5000,
+      "requested_top": 100,
+      "record_count": 100,
+      "request_id": "e526fb86-ec33-4894-921e-d02473b035ce",
+      "page_sha256": "9a9462c85331fbef8f5aab96c669f893fc2eb4f0c4226e0e955000b5a7639ac6",
+      "source_url": "https://datacatalogapi.worldbank.org/dexapps/fone/api/apiservice?datasetId=DS00976&resourceId=RS00906&top=100&skip=5000&type=json"
+    }
+  ],
+  "inspected_records": 600,
+  "distinct_credits": 6,
+  "distinct_credit_periods": 600,
+  "credits_with_multiple_periods": 6,
+  "duplicate_credit_period_identities": [],
+  "conflicting_credit_period_identities": 0,
+  "missing_identity_lineage": [],
+  "malformed_record_lineage": [],
+  "field_variation": {
+    "credit_status": [
+      {
+        "credit_number": "IDA00010",
+        "observed_values": [
+          "Fully Repaid",
+          "Repaid"
+        ]
+      },
+      {
+        "credit_number": "IDA00160",
+        "observed_values": [
+          "Fully Repaid",
+          "Repaid"
+        ]
+      },
+      {
+        "credit_number": "IDA00210",
+        "observed_values": [
+          "Fully Repaid",
+          "Repaid",
+          "Repaying"
+        ]
+      },
+      {
+        "credit_number": "IDA00610",
+        "observed_values": [
+          "Fully Repaid",
+          "Repaid"
+        ]
+      },
+      {
+        "credit_number": "IDA01470",
+        "observed_values": [
+          "Fully Repaid",
+          "Repaid"
+        ]
+      }
+    ],
+    "borrower": [
+      {
+        "credit_number": "IDA00160",
+        "observed_values": [
+          "MINISTRY OF ECONOMIC AFFAIRS",
+          "Ministry of Finance and Economic Affairs"
+        ]
+      },
+      {
+        "credit_number": "IDA01470",
+        "observed_values": [
+          "Ministre de l'Economie, des Finances et",
+          "Ministre des Finances du Budget et de la"
+        ]
+      }
+    ],
+    "project_id": [],
+    "country_code": [],
+    "region": [
+      {
+        "credit_number": "IDA01470",
+        "observed_values": [
+          "AFRICA",
+          "AFRICA EAST",
+          "EASTERN AND SOUTHERN AFRICA",
+          "Eastern and Southern Africa"
+        ]
+      }
+    ],
+    "currency_of_commitment": []
+  },
+  "limitations": [
+    "Sampled pages do not establish uniqueness across the full dataset.",
+    "Requests are not guaranteed to be a consistent upstream snapshot.",
+    "Field changes are descriptive observations, not validation failures."
+  ]
+}
