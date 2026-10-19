@@ -1,0 +1,591 @@
+{
+  "status": "PASS_DAY24_ROLLBACK_BENCHMARK",
+  "tested_at_utc": "2026-10-19T18:28:49.771334+00:00",
+  "db": "flowwatch_day24_gate",
+  "role": "flowwatch_ingestor",
+  "source_kind": "real_world_bank_offline_json_fixture",
+  "source_path": "data\\raw\\world_bank_sample.json",
+  "source_sha256": "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0",
+  "source_file_records_available": 100,
+  "source_api_contacted": false,
+  "source_mongodb_mutated": false,
+  "committed_database_changes": false,
+  "postgres_version": "17.11 (Debian 17.11-1.pgdg13+2)",
+  "python_version": "3.12.4",
+  "counts_before": {
+    "regions": 1,
+    "countries": 1,
+    "projects": 1,
+    "credits": 1,
+    "credit_snapshots": 0
+  },
+  "counts_after": {
+    "regions": 1,
+    "countries": 1,
+    "projects": 1,
+    "credits": 1,
+    "credit_snapshots": 0
+  },
+  "results": [
+    {
+      "n": 5,
+      "repeats": 3,
+      "reference_row": [
+        {
+          "method": "reference_row",
+          "elapsed_seconds": 0.15410590000101365,
+          "records_per_second": 32.445221110723935,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 5
+          },
+          "loaded_records": 5,
+          "operations": {
+            "countries.unchanged": 5,
+            "credit_snapshots.inserted": 5,
+            "credits.unchanged": 5,
+            "projects.unchanged": 5,
+            "regions.unchanged": 5
+          }
+        },
+        {
+          "method": "reference_row",
+          "elapsed_seconds": 0.12079730000550626,
+          "records_per_second": 41.39165361951043,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 5
+          },
+          "loaded_records": 5,
+          "operations": {
+            "countries.unchanged": 5,
+            "credit_snapshots.inserted": 5,
+            "credits.unchanged": 5,
+            "projects.unchanged": 5,
+            "regions.unchanged": 5
+          }
+        },
+        {
+          "method": "reference_row",
+          "elapsed_seconds": 0.12285269999847515,
+          "records_per_second": 40.699146213815894,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 5
+          },
+          "loaded_records": 5,
+          "operations": {
+            "countries.unchanged": 5,
+            "credit_snapshots.inserted": 5,
+            "credits.unchanged": 5,
+            "projects.unchanged": 5,
+            "regions.unchanged": 5
+          }
+        }
+      ],
+      "bulk_copy": [
+        {
+          "method": "bulk_copy",
+          "elapsed_seconds": 0.1117385000034119,
+          "records_per_second": 44.74733417620003,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 5
+          },
+          "loaded_records": 5,
+          "inserted": 5,
+          "updated": 0,
+          "unchanged": 0,
+          "ignored": 0,
+          "copy_seconds": 0.004080499995325226,
+          "merge_seconds": 0.005757999999332242,
+          "entity_seconds": 0.09087719999661203
+        },
+        {
+          "method": "bulk_copy",
+          "elapsed_seconds": 0.09588590000203112,
+          "records_per_second": 52.14531020613131,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 5
+          },
+          "loaded_records": 5,
+          "inserted": 5,
+          "updated": 0,
+          "unchanged": 0,
+          "ignored": 0,
+          "copy_seconds": 0.0025206999998772517,
+          "merge_seconds": 0.004455799993593246,
+          "entity_seconds": 0.08584569999948144
+        },
+        {
+          "method": "bulk_copy",
+          "elapsed_seconds": 0.10725269999966258,
+          "records_per_second": 46.61887299821571,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 5
+          },
+          "loaded_records": 5,
+          "inserted": 5,
+          "updated": 0,
+          "unchanged": 0,
+          "ignored": 0,
+          "copy_seconds": 0.0021421999990707263,
+          "merge_seconds": 0.004547000004095025,
+          "entity_seconds": 0.09544500000629341
+        }
+      ],
+      "median_reference_seconds": 0.12285269999847515,
+      "median_bulk_seconds": 0.10725269999966258,
+      "median_speedup_reference_div_bulk": 1.1454508837433617,
+      "canonical_values_identical": true,
+      "canonical_table_counts_identical": true
+    },
+    {
+      "n": 25,
+      "repeats": 3,
+      "reference_row": [
+        {
+          "method": "reference_row",
+          "elapsed_seconds": 0.5406994000004488,
+          "records_per_second": 46.236411580962084,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 25
+          },
+          "loaded_records": 25,
+          "operations": {
+            "countries.unchanged": 25,
+            "credit_snapshots.inserted": 25,
+            "credits.unchanged": 25,
+            "projects.unchanged": 25,
+            "regions.unchanged": 25
+          }
+        },
+        {
+          "method": "reference_row",
+          "elapsed_seconds": 0.5304954000021098,
+          "records_per_second": 47.12576207051102,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 25
+          },
+          "loaded_records": 25,
+          "operations": {
+            "countries.unchanged": 25,
+            "credit_snapshots.inserted": 25,
+            "credits.unchanged": 25,
+            "projects.unchanged": 25,
+            "regions.unchanged": 25
+          }
+        },
+        {
+          "method": "reference_row",
+          "elapsed_seconds": 0.75699049999821,
+          "records_per_second": 33.02551353030073,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 25
+          },
+          "loaded_records": 25,
+          "operations": {
+            "countries.unchanged": 25,
+            "credit_snapshots.inserted": 25,
+            "credits.unchanged": 25,
+            "projects.unchanged": 25,
+            "regions.unchanged": 25
+          }
+        }
+      ],
+      "bulk_copy": [
+        {
+          "method": "bulk_copy",
+          "elapsed_seconds": 0.41083540000545327,
+          "records_per_second": 60.85162086730637,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 25
+          },
+          "loaded_records": 25,
+          "inserted": 25,
+          "updated": 0,
+          "unchanged": 0,
+          "ignored": 0,
+          "copy_seconds": 0.0022908999962965026,
+          "merge_seconds": 0.005083500000182539,
+          "entity_seconds": 0.398494799999753
+        },
+        {
+          "method": "bulk_copy",
+          "elapsed_seconds": 0.3919453999988036,
+          "records_per_second": 63.78439445921884,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 25
+          },
+          "loaded_records": 25,
+          "inserted": 25,
+          "updated": 0,
+          "unchanged": 0,
+          "ignored": 0,
+          "copy_seconds": 0.0028227000002516434,
+          "merge_seconds": 0.004820400004973635,
+          "entity_seconds": 0.379154499998549
+        },
+        {
+          "method": "bulk_copy",
+          "elapsed_seconds": 0.4837621000042418,
+          "records_per_second": 51.67829393782769,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 25
+          },
+          "loaded_records": 25,
+          "inserted": 25,
+          "updated": 0,
+          "unchanged": 0,
+          "ignored": 0,
+          "copy_seconds": 0.0028582000013557263,
+          "merge_seconds": 0.005197400001634378,
+          "entity_seconds": 0.46995159999642055
+        }
+      ],
+      "median_reference_seconds": 0.5406994000004488,
+      "median_bulk_seconds": 0.41083540000545327,
+      "median_speedup_reference_div_bulk": 1.3160973956802937,
+      "canonical_values_identical": true,
+      "canonical_table_counts_identical": true
+    },
+    {
+      "n": 50,
+      "repeats": 3,
+      "reference_row": [
+        {
+          "method": "reference_row",
+          "elapsed_seconds": 1.0532385000042268,
+          "records_per_second": 47.47262846904983,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 50
+          },
+          "loaded_records": 50,
+          "operations": {
+            "countries.unchanged": 50,
+            "credit_snapshots.inserted": 50,
+            "credits.unchanged": 50,
+            "projects.unchanged": 50,
+            "regions.unchanged": 50
+          }
+        },
+        {
+          "method": "reference_row",
+          "elapsed_seconds": 1.336706400004914,
+          "records_per_second": 37.40537189005468,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 50
+          },
+          "loaded_records": 50,
+          "operations": {
+            "countries.unchanged": 50,
+            "credit_snapshots.inserted": 50,
+            "credits.unchanged": 50,
+            "projects.unchanged": 50,
+            "regions.unchanged": 50
+          }
+        },
+        {
+          "method": "reference_row",
+          "elapsed_seconds": 1.2666591000015615,
+          "records_per_second": 39.473920015210375,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 50
+          },
+          "loaded_records": 50,
+          "operations": {
+            "countries.unchanged": 50,
+            "credit_snapshots.inserted": 50,
+            "credits.unchanged": 50,
+            "projects.unchanged": 50,
+            "regions.unchanged": 50
+          }
+        }
+      ],
+      "bulk_copy": [
+        {
+          "method": "bulk_copy",
+          "elapsed_seconds": 0.793126000004122,
+          "records_per_second": 63.04168568391421,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 50
+          },
+          "loaded_records": 50,
+          "inserted": 50,
+          "updated": 0,
+          "unchanged": 0,
+          "ignored": 0,
+          "copy_seconds": 0.002318300001206808,
+          "merge_seconds": 0.004625399997166824,
+          "entity_seconds": 0.7810267000022577
+        },
+        {
+          "method": "bulk_copy",
+          "elapsed_seconds": 0.9967388000004576,
+          "records_per_second": 50.16359351113556,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 50
+          },
+          "loaded_records": 50,
+          "inserted": 50,
+          "updated": 0,
+          "unchanged": 0,
+          "ignored": 0,
+          "copy_seconds": 0.003123799993772991,
+          "merge_seconds": 0.006082500003685709,
+          "entity_seconds": 0.980681300003198
+        },
+        {
+          "method": "bulk_copy",
+          "elapsed_seconds": 1.1303774999978486,
+          "records_per_second": 44.2330106536048,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 50
+          },
+          "loaded_records": 50,
+          "inserted": 50,
+          "updated": 0,
+          "unchanged": 0,
+          "ignored": 0,
+          "copy_seconds": 0.0037420999942696653,
+          "merge_seconds": 0.007122499999240972,
+          "entity_seconds": 1.1121965999991517
+        }
+      ],
+      "median_reference_seconds": 1.2666591000015615,
+      "median_bulk_seconds": 0.9967388000004576,
+      "median_speedup_reference_div_bulk": 1.2708034441931828,
+      "canonical_values_identical": true,
+      "canonical_table_counts_identical": true
+    },
+    {
+      "n": 100,
+      "repeats": 3,
+      "reference_row": [
+        {
+          "method": "reference_row",
+          "elapsed_seconds": 2.7576633999997284,
+          "records_per_second": 36.26258375116044,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 100
+          },
+          "loaded_records": 100,
+          "operations": {
+            "countries.unchanged": 100,
+            "credit_snapshots.inserted": 100,
+            "credits.unchanged": 100,
+            "projects.unchanged": 100,
+            "regions.unchanged": 100
+          }
+        },
+        {
+          "method": "reference_row",
+          "elapsed_seconds": 2.415633800002979,
+          "records_per_second": 41.39700313842134,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 100
+          },
+          "loaded_records": 100,
+          "operations": {
+            "countries.unchanged": 100,
+            "credit_snapshots.inserted": 100,
+            "credits.unchanged": 100,
+            "projects.unchanged": 100,
+            "regions.unchanged": 100
+          }
+        },
+        {
+          "method": "reference_row",
+          "elapsed_seconds": 2.343099199999415,
+          "records_per_second": 42.67851740977291,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 100
+          },
+          "loaded_records": 100,
+          "operations": {
+            "countries.unchanged": 100,
+            "credit_snapshots.inserted": 100,
+            "credits.unchanged": 100,
+            "projects.unchanged": 100,
+            "regions.unchanged": 100
+          }
+        }
+      ],
+      "bulk_copy": [
+        {
+          "method": "bulk_copy",
+          "elapsed_seconds": 1.508140199999616,
+          "records_per_second": 66.30683274673366,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 100
+          },
+          "loaded_records": 100,
+          "inserted": 100,
+          "updated": 0,
+          "unchanged": 0,
+          "ignored": 0,
+          "copy_seconds": 0.00356399999873247,
+          "merge_seconds": 0.006010200006130617,
+          "entity_seconds": 1.4909224000002723
+        },
+        {
+          "method": "bulk_copy",
+          "elapsed_seconds": 1.662921200004348,
+          "records_per_second": 60.13514049838232,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 100
+          },
+          "loaded_records": 100,
+          "inserted": 100,
+          "updated": 0,
+          "unchanged": 0,
+          "ignored": 0,
+          "copy_seconds": 0.004204700002446771,
+          "merge_seconds": 0.007438500004354864,
+          "entity_seconds": 1.6425581000003149
+        },
+        {
+          "method": "bulk_copy",
+          "elapsed_seconds": 1.9297473999977228,
+          "records_per_second": 51.82025378042639,
+          "counts": {
+            "regions": 1,
+            "countries": 1,
+            "projects": 1,
+            "credits": 1,
+            "credit_snapshots": 100
+          },
+          "loaded_records": 100,
+          "inserted": 100,
+          "updated": 0,
+          "unchanged": 0,
+          "ignored": 0,
+          "copy_seconds": 0.0028107999969506636,
+          "merge_seconds": 0.0056981000016094185,
+          "entity_seconds": 1.9140411000043969
+        }
+      ],
+      "median_reference_seconds": 2.415633800002979,
+      "median_bulk_seconds": 1.662921200004348,
+      "median_speedup_reference_div_bulk": 1.4526447795582034,
+      "canonical_values_identical": true,
+      "canonical_table_counts_identical": true
+    }
+  ],
+  "controlled_correction_probe": {
+    "reject": true,
+    "ignore": true,
+    "explicit_update": true,
+    "same_key_divergence_rejected": true,
+    "rollback_only": true,
+    "reference_bulk_same_result": true
+  },
+  "bulk_three_pass_replay": {
+    "passes": 3,
+    "batch_size": 5,
+    "inserted_per_pass": [
+      5,
+      0,
+      0
+    ],
+    "stable_ids": true,
+    "stable_counts": true,
+    "probe_rolled_back": true
+  },
+  "limitations": [
+    "Initial laptop benchmark: no concurrent writers and no throughput SLA claim.",
+    "Whole-path timing includes entity upserts; COPY is only the snapshot phase.",
+    "Benchmark source is a real offline sample, not a new MongoDB ingestion run.",
+    "Only original source observations are used; no generated samples.",
+    "Temporary staging and canonical writes are unconditionally rolled back.",
+    "Source correction ordering still needs a production precedence rule."
+  ]
+}
