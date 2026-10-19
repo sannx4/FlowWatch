@@ -1,0 +1,11 @@
+{
+  "checked_at_utc": "2026-10-19T14:11:20.430349+00:00",
+  "source_path": "data\\raw\\world_bank_sample.json",
+  "source_records": 100,
+  "matched_records": 100,
+  "mismatched_records": 0,
+  "gate": "PASS",
+  "sample_differences": [],
+  "source_api_contacted": false,
+  "postgresql_modified": false
+}
