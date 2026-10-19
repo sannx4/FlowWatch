@@ -1,0 +1,85 @@
+{
+  "tested_at_utc": "2026-10-19T14:58:57.896668+00:00",
+  "source_run_id": "f0e87dd0-001a-5447-bca9-27da56fa9575",
+  "source_records": 5,
+  "database": "flowwatch_day23_gate",
+  "database_role": "flowwatch_ingestor",
+  "counts_before": {
+    "regions": 1,
+    "countries": 1,
+    "projects": 1,
+    "credits": 1,
+    "credit_snapshots": 0
+  },
+  "counts_per_committed_pass": [
+    {
+      "regions": 1,
+      "countries": 1,
+      "projects": 1,
+      "credits": 1,
+      "credit_snapshots": 5
+    },
+    {
+      "regions": 1,
+      "countries": 1,
+      "projects": 1,
+      "credits": 1,
+      "credit_snapshots": 5
+    },
+    {
+      "regions": 1,
+      "countries": 1,
+      "projects": 1,
+      "credits": 1,
+      "credit_snapshots": 5
+    }
+  ],
+  "operations_per_pass": [
+    {
+      "countries.unchanged": 5,
+      "credit_snapshots.inserted": 5,
+      "credits.unchanged": 5,
+      "projects.unchanged": 5,
+      "regions.unchanged": 5
+    },
+    {
+      "countries.unchanged": 5,
+      "credit_snapshots.unchanged": 5,
+      "credits.unchanged": 5,
+      "projects.unchanged": 5,
+      "regions.unchanged": 5
+    },
+    {
+      "countries.unchanged": 5,
+      "credit_snapshots.unchanged": 5,
+      "credits.unchanged": 5,
+      "projects.unchanged": 5,
+      "regions.unchanged": 5
+    }
+  ],
+  "snapshot_primary_keys_same_across_replays": true,
+  "snapshot_business_keys_unique": true,
+  "simulated_correction_rollback": {
+    "reject_changed_snapshot": true,
+    "ignore_changed_snapshot": true,
+    "explicit_update_applied": true,
+    "probe_rolled_back": true
+  },
+  "counts_after_rollback": {
+    "regions": 1,
+    "countries": 1,
+    "projects": 1,
+    "credits": 1,
+    "credit_snapshots": 5
+  },
+  "source_api_contacted": false,
+  "stored_raw_records_mutated": false,
+  "status": "PASS_DAY23_ISOLATED_GATE",
+  "limitations": [
+    "Tested a bounded batch, not the full historical source.",
+    "Correction exercise uses a synthetic modification rolled back afterward.",
+    "Real upstream corrections require explicit source-version precedence review.",
+    "Row status counts assume single-writer gate execution.",
+    "Legacy replay entrypoints remain unchanged pending deployment cutover."
+  ]
+}
