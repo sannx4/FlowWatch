@@ -1,0 +1,26 @@
+{
+  "checked_at_utc": "2026-10-19T09:37:52.231768+00:00",
+  "gate_database": "flowwatch_day21_gate",
+  "mode": "committed_isolated_database",
+  "postgres_role": "flowwatch_ingestor",
+  "mongo_run_id": "f0e87dd0-001a-5447-bca9-27da56fa9575",
+  "raw_records_selected": 5,
+  "accepted_records": 5,
+  "rejected_records": 0,
+  "quarantined_records_persisted": 0,
+  "warning_rule_counts": {},
+  "snapshot_count_before": 0,
+  "snapshot_count_after_first_commit": 5,
+  "snapshot_count_after_second_commit": 5,
+  "distinct_temporal_identities": 5,
+  "duplicate_rows_added_on_rerun": 0,
+  "all_selected_input_accounted_for": true,
+  "lineage_verified_on_both_commits": true,
+  "source_api_contacted": false,
+  "limitations": [
+    "This gate verifies stored MongoDB sample replay, not new API retrieval.",
+    "The sample has no rejections; durable quarantine is unverified.",
+    "The production FlowWatch database is not modified by this script.",
+    "Replaying identical source data can upsert rows, even when counts stay stable."
+  ]
+}

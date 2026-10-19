@@ -1,0 +1,27 @@
+{
+  "checked_at_utc": "2026-10-19T09:26:31.847414+00:00",
+  "mode": "transactional_dry_run_rolled_back",
+  "database_user": "flowwatch_ingestor",
+  "mongo_run_id": "f0e87dd0-001a-5447-bca9-27da56fa9575",
+  "raw_records_selected": 5,
+  "accepted": 5,
+  "rejected_accounted_in_memory": 0,
+  "durable_quarantine_records_written": 0,
+  "rejection_rule_counts": {},
+  "warning_rule_counts": {},
+  "canonical_rows_before": 100,
+  "canonical_rows_after_first_replay_inside_transaction": 100,
+  "canonical_rows_after_second_replay_inside_transaction": 100,
+  "logical_rows_added_on_first_replay": 0,
+  "duplicate_rows_added_on_second_replay": 0,
+  "canonical_rows_after_rollback": 100,
+  "source_api_contacted": false,
+  "gate_status": "DRY_RUN_PASS_NOT_DURABLE_END_TO_END_GATE",
+  "limitations": [
+    "Both replay passes are deliberately rolled back to protect existing canonical data.",
+    "No durable quarantine or warning-event persistence is implemented by this check.",
+    "This test does not establish a committed multi-store ingestion or atomic Mongo/PostgreSQL write.",
+    "Selected records must form contiguous prefixes of each sampled source page.",
+    "A separate committed isolated-database test is required before tagging v0.1-core."
+  ]
+}
