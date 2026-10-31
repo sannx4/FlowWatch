@@ -1,0 +1,29 @@
+{
+  "status": "PASS_EXISTING_CANONICAL_PUBLICATION",
+  "run_id": "241490b7-5d6e-4392-b351-f6308118cf98",
+  "canonical_loaded": true,
+  "source_pages": 3,
+  "source_records": 3000,
+  "source_total_reported": 1612290,
+  "valid_candidates": 3000,
+  "invalid_candidates": 0,
+  "temporal_profile": {
+    "observations": 3000,
+    "unique_temporal_keys": 3000,
+    "duplicate_temporal_observations": 0,
+    "earliest_date": "2011-04-30",
+    "latest_date": "2025-01-31",
+    "unique_credits": 19
+  },
+  "limit": 10000,
+  "note": "A bounded subset; not a representative sample or full backfill.",
+  "reused": true,
+  "fetched": 3000,
+  "accepted": 3000,
+  "rejected": 0,
+  "inserted": 3000,
+  "updated": 0,
+  "unchanged": 0,
+  "ignored": 0,
+  "pages": 3
+}
