@@ -96,7 +96,7 @@ jobs:
           python -m alembic upgrade head
           python -m alembic current
           python -m alembic heads
-          test "$(psql -h 127.0.0.1 -U flowwatch_owner -d flowwatch_day28_gate -At -c 'SELECT version_num FROM alembic_version')" = 'd26e00260001'
+          test "$(psql -h 127.0.0.1 -U flowwatch_owner -d flowwatch_day28_gate -At -c 'SELECT version_num FROM alembic_version')" = 'd29b00000001'
       - name: Downgrade and repeat upgrade
         run: |
           python -m alembic downgrade d25cafe01250

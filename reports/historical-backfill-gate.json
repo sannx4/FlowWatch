@@ -1,0 +1,15 @@
+{
+  "status": "PASS_BOUNDED_RAW_CAPTURE",
+  "run_id": "13451dc8-9ac9-4f0b-a31f-6b184805997c",
+  "source_total_reported": 1612290,
+  "pages_committed": 3,
+  "raw_records_committed": 3000,
+  "pages_fetched_this_execution": 2,
+  "remaining_pages": 0,
+  "canonical_loaded": false,
+  "source_mode": "independently_fetched_world_bank_top_skip_pages",
+  "snapshot_consistency_guaranteed_by_upstream": false,
+  "postgres_database": "flowwatch_historical_gate",
+  "mongo_db": "flowwatch_historical_gate_raw",
+  "limitation": "Source can reorder across requests despite constant total_count; no point-in-time API snapshot is guaranteed."
+}
