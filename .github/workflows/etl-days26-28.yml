@@ -1,0 +1,191 @@
+name: FlowWatch ETL Days 26-28
+
+on:
+  pull_request:
+    paths:
+      - 'alembic/**'
+      - 'src/**'
+      - 'sql/**'
+      - 'docs/**'
+      - 'README_DAYS26_27_28.md'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/etl-days26-28.yml'
+      - 'data/raw/world_bank_sample.json'
+      - 'pyproject.toml'
+      - 'requirements*.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: etl-days26-28-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fast-tests:
+    name: Static checks and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install repository + test tooling
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then python -m pip install -r requirements-dev.txt; fi
+          python -m pip install pytest ruff mypy 'psycopg[binary]' pymongo alembic sqlalchemy python-dotenv
+      - name: Ruff
+        run: python -m ruff check src tests scripts
+      - name: mypy Day26-28
+        run: python -m mypy src/quality/reconcile.py scripts/day28_etl_gate.py scripts/day27_migration_failure_probe.py
+      - name: Full fast unit suite
+        run: python -m pytest -q tests/unit
+
+  migration-test:
+    name: Migration upgrade / downgrade / injected failure
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: flowwatch_owner
+          POSTGRES_PASSWORD: ci_owner
+          POSTGRES_DB: flowwatch_day28_gate
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U flowwatch_owner -d flowwatch_day28_gate"
+          --health-interval 5s --health-timeout 4s --health-retries 15
+    env:
+      POSTGRES_HOST: '127.0.0.1'
+      POSTGRES_PORT: '5432'
+      POSTGRES_DB: flowwatch_day28_gate
+      POSTGRES_USER: flowwatch_owner
+      POSTGRES_PASSWORD: ci_owner
+      PGPASSWORD: ci_owner
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install repository and DB tooling
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then python -m pip install -r requirements-dev.txt; fi
+          python -m pip install alembic sqlalchemy 'psycopg[binary]' python-dotenv
+      - name: Create isolated CI ingestion role
+        run: |
+          psql -h 127.0.0.1 -U flowwatch_owner -d flowwatch_day28_gate -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE flowwatch_ingestor LOGIN PASSWORD 'ci_ingestor';
+          CREATE ROLE flowwatch_api LOGIN PASSWORD 'ci_api';
+          GRANT CONNECT ON DATABASE flowwatch_day28_gate TO flowwatch_api;
+          GRANT USAGE ON SCHEMA public TO flowwatch_api;
+          GRANT CONNECT ON DATABASE flowwatch_day28_gate TO flowwatch_ingestor;
+          GRANT USAGE ON SCHEMA public TO flowwatch_ingestor;
+          SQL
+      - name: Apply all schema migrations
+        run: |
+          python -m alembic upgrade head
+          python -m alembic current
+          python -m alembic heads
+          test "$(psql -h 127.0.0.1 -U flowwatch_owner -d flowwatch_day28_gate -At -c 'SELECT version_num FROM alembic_version')" = 'd26e00260001'
+      - name: Downgrade and repeat upgrade
+        run: |
+          python -m alembic downgrade d25cafe01250
+          test "$(psql -h 127.0.0.1 -U flowwatch_owner -d flowwatch_day28_gate -At -c "SELECT to_regclass('public.etl_attempts') IS NULL")" = 't'
+          python -m alembic upgrade d26e00260001
+          test "$(psql -h 127.0.0.1 -U flowwatch_owner -d flowwatch_day28_gate -At -c 'SELECT version_num FROM alembic_version')" = 'd26e00260001'
+          python -m alembic downgrade f7b19a2c4d63
+          test "$(psql -h 127.0.0.1 -U flowwatch_owner -d flowwatch_day28_gate -At -c "SELECT to_regclass('public.source_quarantine') IS NULL")" = 't'
+          python -m alembic upgrade d26e00260001
+          test "$(psql -h 127.0.0.1 -U flowwatch_owner -d flowwatch_day28_gate -At -c 'SELECT version_num FROM alembic_version')" = 'd26e00260001'
+      - name: Inject deliberately broken migration, demand failure and rollback
+        run: python -m scripts.day27_migration_failure_probe
+
+  live-integration:
+    name: Ephemeral PostgreSQL + MongoDB ETL gate
+    needs: [fast-tests, migration-test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: flowwatch_owner
+          POSTGRES_PASSWORD: ci_owner
+          POSTGRES_DB: flowwatch_day28_gate
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U flowwatch_owner -d flowwatch_day28_gate"
+          --health-interval 5s --health-timeout 4s --health-retries 15
+      mongodb:
+        image: mongo:8
+        env:
+          MONGO_INITDB_ROOT_USERNAME: ci_mongo
+          MONGO_INITDB_ROOT_PASSWORD: ci_mongo
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --username ci_mongo --password ci_mongo --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 }).ok'"
+          --health-interval 7s --health-timeout 5s --health-retries 15
+    env:
+      POSTGRES_HOST: '127.0.0.1'
+      POSTGRES_PORT: '5432'
+      POSTGRES_DB: flowwatch_day28_gate
+      POSTGRES_USER: flowwatch_owner
+      POSTGRES_PASSWORD: ci_owner
+      PGPASSWORD: ci_owner
+      FLOWWATCH_GATE_PG_PASSWORD: ci_ingestor
+      FLOWWATCH_GATE_MONGO_URI: mongodb://ci_mongo:ci_mongo@127.0.0.1:27017/?authSource=admin
+      FLOWWATCH_RUN_INTEGRATION: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install project and integration dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then python -m pip install -r requirements-dev.txt; fi
+          python -m pip install pytest alembic sqlalchemy 'psycopg[binary]' pymongo python-dotenv
+      - name: Create ingestion role and migrate ephemeral schema
+        run: |
+          psql -h 127.0.0.1 -U flowwatch_owner -d flowwatch_day28_gate -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE flowwatch_ingestor LOGIN PASSWORD 'ci_ingestor';
+          CREATE ROLE flowwatch_api LOGIN PASSWORD 'ci_api';
+          GRANT CONNECT ON DATABASE flowwatch_day28_gate TO flowwatch_api;
+          GRANT USAGE ON SCHEMA public TO flowwatch_api;
+          GRANT CONNECT ON DATABASE flowwatch_day28_gate TO flowwatch_ingestor;
+          GRANT USAGE ON SCHEMA public TO flowwatch_ingestor;
+          SQL
+          python -m alembic upgrade head
+          psql -h 127.0.0.1 -U flowwatch_owner -d flowwatch_day28_gate -v ON_ERROR_STOP=1 <<'SQL'
+          GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO flowwatch_ingestor;
+          GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO flowwatch_ingestor;
+          REVOKE UPDATE, DELETE ON public.etl_attempts, public.etl_record_decisions FROM flowwatch_ingestor;
+          SQL
+      - name: Execute Day28 offline 10-window ETL gate
+        run: python -m scripts.day28_etl_gate --source-file data/raw/world_bank_sample.json --windows 10
+      - name: Verify idempotent re-invocation skips committed attempts
+        run: python -m scripts.day28_etl_gate --source-file data/raw/world_bank_sample.json --windows 10
+      - name: Check committed evidence through independent integration tests
+        run: python -m pytest -q tests/integration/test_day28_etl_gate.py
+      - name: Upload gate evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: etl-days26-28-evidence
+          path: |
+            reports/day28-etl-gate.json
+            reports/etl-gate.md
+          if-no-files-found: warn

@@ -1,0 +1,20 @@
+{
+  "phase": "PASS_DAY25_PERSIST_AND_REPLAY",
+  "tested_at_utc": "2026-10-19T18:55:45.902351+00:00",
+  "database": "flowwatch_day25_gate",
+  "quarantine_id": 1,
+  "source_run_id": "f0e87dd0-001a-5447-bca9-27da56fa9575",
+  "source_record_key": "record:ef1f6c51f458cc7a9635482608dfc584740a5ef412b541f62975ad31ce162728",
+  "source_checksum": "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0",
+  "offending_field": "cancelled_amount_us_",
+  "offending_stored_float_repr": "572026.03",
+  "occurrences": 1,
+  "source_api_contacted": false,
+  "source_mongodb_mutated": false,
+  "research_note": "A parser incompatibility, not an invalid World Bank observation. Never silently exclude from training populations.",
+  "verified_at_utc": "2026-10-19T18:58:00.021458+00:00",
+  "resolved_snapshot_id": 1,
+  "retry_count": 1,
+  "temporal_duplicates": 0,
+  "stored_raw_records_mutated": false
+}

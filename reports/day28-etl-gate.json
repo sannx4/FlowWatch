@@ -1,0 +1,91 @@
+{
+  "status": "PASS_DAY26_27_28_LOCAL_ETL_GATE",
+  "tested_at_utc": "2026-10-31T06:44:36.574227+00:00",
+  "run_id": "554abdc8-190b-5d2a-bbf8-ff31bf8689c7",
+  "postgres_database": "flowwatch_day28_gate",
+  "mongo_database": "flowwatch_day28_gate_raw",
+  "source_mode": "logical_windows_of_single_stored_page",
+  "source_observations": 100,
+  "source_pages": 10,
+  "resumed_completed_attempts": [
+    1,
+    2,
+    3
+  ],
+  "source_checksums": [
+    "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0",
+    "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0",
+    "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0",
+    "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0",
+    "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0",
+    "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0",
+    "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0",
+    "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0",
+    "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0",
+    "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0"
+  ],
+  "observed": {
+    "attempts": [
+      {
+        "attempt_no": 1,
+        "source_pages": 10,
+        "fetched": 100,
+        "raw_stored": 100,
+        "accepted": 99,
+        "rejected": 1,
+        "inserted": 99,
+        "updated": 0,
+        "unchanged": 0,
+        "ignored": 0,
+        "status": "PASS"
+      },
+      {
+        "attempt_no": 2,
+        "source_pages": 10,
+        "fetched": 100,
+        "raw_stored": 100,
+        "accepted": 100,
+        "rejected": 0,
+        "inserted": 1,
+        "updated": 0,
+        "unchanged": 99,
+        "ignored": 0,
+        "status": "PASS"
+      },
+      {
+        "attempt_no": 3,
+        "source_pages": 10,
+        "fetched": 100,
+        "raw_stored": 100,
+        "accepted": 100,
+        "rejected": 0,
+        "inserted": 0,
+        "updated": 0,
+        "unchanged": 100,
+        "ignored": 0,
+        "status": "PASS"
+      }
+    ],
+    "canonical_snapshot_count": 100,
+    "duplicate_temporal_groups": 0,
+    "unresolved_quarantine": 0,
+    "quarantine": [
+      {
+        "status": "RESOLVED",
+        "retry_count": 1,
+        "source_record_key": "day28:1:51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0:0",
+        "source_checksum": "51a8ce3625d459d54beebf034f28b6aaddbc17dd6af66bde815ae10d227e4de0",
+        "resolved_snapshot_id": 100
+      }
+    ]
+  },
+  "fault_injection_detection": true,
+  "source_api_contacted": false,
+  "limitations": [
+    "The fixture-window mode is not a true independent 10-API-page source acquisition.",
+    "The replay is a single-worker deterministic local gate; concurrent writers untested.",
+    "Day25 legacy-parser failure is deliberately selected as a controlled test condition.",
+    "This proves no unexplained loss for this tested run, not all future upstream inputs.",
+    "CI migration upgrade/downgrade and isolated runners require a separate GitHub Actions run."
+  ]
+}
