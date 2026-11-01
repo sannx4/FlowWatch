@@ -1,0 +1,14 @@
+# Deliberately hard-coded isolated db/schema. Never use the primary 'flowwatch' DB.
+flowwatch_historical:
+  target: isolated
+  outputs:
+    isolated:
+      type: postgres
+      host: "{{ env_var('POSTGRES_HOST', '127.0.0.1') }}"
+      port: "{{ env_var('POSTGRES_PORT', '5434') | int }}"
+      user: flowwatch_owner
+      password: "{{ env_var('FLOWWATCH_DBT_PASSWORD') }}"
+      dbname: flowwatch_historical_gate
+      schema: fw_analytics
+      threads: 2
+      connect_timeout: 10

@@ -1,0 +1,14 @@
+version: 2
+sources:
+  - name: operational
+    database: flowwatch_historical_gate
+    schema: public
+    description: Verified isolated PostgreSQL canonical operational source.
+    tables:
+      - name: regions
+      - name: countries
+      - name: projects
+      - name: credits
+      - name: credit_snapshots
+      - name: historical_canonical_publications
+      - name: historical_canonical_decisions

@@ -1,0 +1,67 @@
+version: 2
+models:
+  - name: stg_credit_snapshots
+    description: Untouched NUMERIC canonical period-end source values.
+    columns:
+      - name: credit_snapshot_id
+        data_tests: [not_null, unique]
+      - name: credit_id
+        data_tests: [not_null]
+      - name: end_of_period
+        data_tests: [not_null]
+  - name: dim_country
+    columns:
+      - name: country_id
+        data_tests: [not_null, unique]
+      - name: region_id
+        data_tests: [not_null]
+  - name: dim_project
+    columns:
+      - name: project_pk
+        data_tests: [not_null, unique]
+      - name: country_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_country')
+                field: country_id
+  - name: dim_credit
+    columns:
+      - name: credit_id
+        data_tests: [not_null, unique]
+      - name: project_pk
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_project')
+                field: project_pk
+  - name: fct_credit_period
+    description: One row per credit + calendar period. Values are period-end balances.
+    columns:
+      - name: credit_snapshot_id
+        data_tests: [not_null, unique]
+      - name: credit_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_credit')
+                field: credit_id
+      - name: country_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_country')
+                field: country_id
+      - name: end_of_period
+        data_tests: [not_null]
+  - name: mart_credit_period_metrics
+    description: Month-adjacent stock deltas; not confirmed disbursement or repayment cash flows.
+    columns:
+      - name: credit_snapshot_id
+        data_tests: [not_null, unique]
+      - name: is_consecutive_month
+        data_tests: [not_null]

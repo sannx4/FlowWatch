@@ -1,0 +1,30 @@
+{
+  "status": "PASS_DBT_FINANCIAL_WAREHOUSE",
+  "warehouse_built": true,
+  "database": "flowwatch_historical_gate",
+  "schema": "fw_analytics",
+  "source": {
+    "run_id": "241490b7-5d6e-4392-b351-f6308118cf98",
+    "published_observations": 3000,
+    "published_accepted": 3000,
+    "published_rejected": 0,
+    "canonical_snapshot_rows": 3000,
+    "canonical_credits": 19,
+    "first_period": "2011-04-30",
+    "last_period": "2025-01-31"
+  },
+  "warehouse": {
+    "source_count": 3000,
+    "fact_count": 3000,
+    "metric_count": 3000,
+    "source_credit_count": 19,
+    "dim_credit_count": 19,
+    "source_project_count": 19,
+    "dim_project_count": 19,
+    "source_country_count": 11,
+    "dim_country_count": 11,
+    "adjacent_observations": 2977,
+    "nonadjacent_observations": 23
+  },
+  "research_limitation": "Bounded source capture; not independent samples or complete history. Period-end stock changes are not verified cash flows."
+}
