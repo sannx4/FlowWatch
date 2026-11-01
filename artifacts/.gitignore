@@ -1,0 +1,3 @@
+# Keep generated data and manifests out of source control by default.
+*
+!.gitignore
