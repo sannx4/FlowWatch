@@ -9,6 +9,7 @@ on:
       - 'tests/unit/test_day39_42_*'
       - 'docs/day39-42-research-contract.md'
       - 'requirements-research.txt'
+      - 'requirements.txt'
       - '.github/workflows/day39-42-research-parquet.yml'
       - 'warehouse_dbt/**'
       - 'scripts/day34_38_dbt_gate.py'
