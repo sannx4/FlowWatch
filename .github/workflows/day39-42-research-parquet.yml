@@ -1,0 +1,87 @@
+name: FlowWatch V7 Day39-42 Research + Parquet Gate
+
+on:
+  pull_request:
+    paths:
+      - 'src/warehouse/research_contracts.py'
+      - 'scripts/day39_42_research_export.py'
+      - 'scripts/day39_42_ci_assert.py'
+      - 'tests/unit/test_day39_42_*'
+      - 'docs/day39-42-research-contract.md'
+      - 'requirements-research.txt'
+      - 'requirements.txt'
+      - '.github/workflows/day39-42-research-parquet.yml'
+      - 'warehouse_dbt/**'
+      - 'scripts/day34_38_dbt_gate.py'
+      - 'sql/warehouse/day34_ci_seed.sql'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  isolated-research-parquet:
+    name: Synthetic PostgreSQL + dbt + Parquet replay
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: flowwatch_owner
+          POSTGRES_PASSWORD: ci_owner
+          POSTGRES_DB: flowwatch_historical_gate
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U flowwatch_owner -d flowwatch_historical_gate"
+          --health-interval 5s --health-timeout 4s --health-retries 15
+    env:
+      POSTGRES_HOST: '127.0.0.1'
+      POSTGRES_PORT: '5432'
+      POSTGRES_DB: flowwatch_historical_gate
+      POSTGRES_USER: flowwatch_owner
+      POSTGRES_PASSWORD: ci_owner
+      FLOWWATCH_DBT_PASSWORD: ci_owner
+      PGPASSWORD: ci_owner
+      FLOWWATCH_DBT_DISABLE_TELEMETRY: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install project and isolated-research tools
+        run: |
+          python -m pip install -r requirements.txt -r requirements-dbt.txt -r requirements-research.txt
+          python -m pip install pytest
+      - name: Create synthetic-only role and apply migrations
+        run: |
+          psql -h 127.0.0.1 -U flowwatch_owner -d flowwatch_historical_gate -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE flowwatch_ingestor LOGIN PASSWORD 'ci_ingestor';
+          SQL
+          python -m alembic upgrade head
+      - name: Seed synthetic Day34 canonical publication
+        run: |
+          psql -h 127.0.0.1 -U flowwatch_owner -d flowwatch_historical_gate \
+            -v ON_ERROR_STOP=1 -f sql/warehouse/day34_ci_seed.sql
+      - name: Check Day39-42 contracts and construct warehouse
+        run: |
+          python -m pytest -q tests/unit/test_day39_42_research_contracts.py tests/unit/test_day39_42_export_contracts.py
+          python -m scripts.day34_38_dbt_gate --run-id 00000000-0000-4000-8000-000000000034 --build
+      - name: Audit, Parquet publish and exact reuse
+        run: |
+          python -m scripts.day39_42_research_export --run-id 00000000-0000-4000-8000-000000000034
+          python -m scripts.day39_42_research_export --run-id 00000000-0000-4000-8000-000000000034 --export
+          python -m scripts.day39_42_ci_assert --expected-reused false
+          python -m scripts.day39_42_research_export --run-id 00000000-0000-4000-8000-000000000034 --export
+          python -m scripts.day39_42_ci_assert --expected-reused true
+      - name: Upload non-sensitive CI evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: day39-42-synthetic-research-gate
+          path: |
+            reports/day39-42-research-gate.json
+            reports/day34-38-warehouse-gate.json
+          if-no-files-found: warn

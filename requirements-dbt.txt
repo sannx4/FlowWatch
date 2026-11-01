@@ -1,0 +1,3 @@
+# FlowWatch V7 - Stable dbt versions
+dbt-core==1.11.16
+dbt-postgres==1.11.0

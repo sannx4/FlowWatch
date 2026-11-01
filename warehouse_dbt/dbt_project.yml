@@ -1,0 +1,15 @@
+name: flowwatch_financial
+version: '1.0.0'
+config-version: 2
+profile: flowwatch_historical
+model-paths: ['models']
+test-paths: ['tests']
+clean-targets: ['target', 'dbt_packages']
+models:
+  flowwatch_financial:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
+    reporting:
+      +materialized: view

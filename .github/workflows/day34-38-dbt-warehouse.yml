@@ -1,0 +1,74 @@
+name: FlowWatch Day34-38 dbt Financial Warehouse
+on:
+  pull_request:
+    paths:
+      - 'warehouse_dbt/**'
+      - 'sql/warehouse/**'
+      - 'scripts/day34_38_dbt_gate.py'
+      - 'tests/unit/test_day34_warehouse_package.py'
+      - 'requirements-dbt.txt'
+      - 'requirements.txt'
+      - '.github/workflows/day34-38-dbt-warehouse.yml'
+      - 'alembic/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dbt-isolated-warehouse:
+    name: Isolated PostgreSQL warehouse + dbt build/test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: flowwatch_owner
+          POSTGRES_PASSWORD: ci_owner
+          POSTGRES_DB: flowwatch_historical_gate
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U flowwatch_owner -d flowwatch_historical_gate"
+          --health-interval 5s --health-timeout 4s --health-retries 15
+    env:
+      POSTGRES_HOST: '127.0.0.1'
+      POSTGRES_PORT: '5432'
+      POSTGRES_DB: flowwatch_historical_gate
+      POSTGRES_USER: flowwatch_owner
+      POSTGRES_PASSWORD: ci_owner
+      FLOWWATCH_DBT_PASSWORD: ci_owner
+      PGPASSWORD: ci_owner
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install app, dbt and test dependencies
+        run: |
+          python -m pip install -r requirements.txt -r requirements-dbt.txt
+      - name: Create only ephemeral role and migrate
+        run: |
+          psql -h 127.0.0.1 -U flowwatch_owner -d flowwatch_historical_gate -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE flowwatch_ingestor LOGIN PASSWORD 'ci_ingestor';
+          SQL
+          python -m alembic upgrade head
+      - name: Seed synthetic temporal financial observations
+        run: |
+          psql -h 127.0.0.1 -U flowwatch_owner -d flowwatch_historical_gate \
+               -v ON_ERROR_STOP=1 -f sql/warehouse/day34_ci_seed.sql
+      - name: Run package tests and dbt warehouse gate
+        run: |
+          python -m pytest -q tests/unit/test_day34_warehouse_package.py
+          python -m scripts.day34_38_dbt_gate --run-id 00000000-0000-4000-8000-000000000034 --build
+      - name: Assert exact fixture month-gap behavior
+        run: python -m scripts.day34_38_ci_assert
+      - name: Save audit proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: day34-38-warehouse-proof
+          path: |
+            reports/day34-38-warehouse-gate.json
+            warehouse_dbt/target/run_results.json
+          if-no-files-found: warn
