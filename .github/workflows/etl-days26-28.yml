@@ -37,7 +37,7 @@ jobs:
       - name: Install repository + test tooling
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
+          if [ -f requirements.txt ]; then python -m pip install -r requirements.txt -r requirements-api.txt; fi
           if [ -f requirements-dev.txt ]; then python -m pip install -r requirements-dev.txt; fi
           python -m pip install pytest ruff mypy 'psycopg[binary]' pymongo alembic sqlalchemy python-dotenv
       - name: Ruff
@@ -78,7 +78,7 @@ jobs:
       - name: Install repository and DB tooling
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
+          if [ -f requirements.txt ]; then python -m pip install -r requirements.txt -r requirements-api.txt; fi
           if [ -f requirements-dev.txt ]; then python -m pip install -r requirements-dev.txt; fi
           python -m pip install alembic sqlalchemy 'psycopg[binary]' python-dotenv
       - name: Create isolated CI ingestion role
@@ -155,7 +155,7 @@ jobs:
       - name: Install project and integration dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
+          if [ -f requirements.txt ]; then python -m pip install -r requirements.txt -r requirements-api.txt; fi
           if [ -f requirements-dev.txt ]; then python -m pip install -r requirements-dev.txt; fi
           python -m pip install pytest alembic sqlalchemy 'psycopg[binary]' pymongo python-dotenv
       - name: Create ingestion role and migrate ephemeral schema

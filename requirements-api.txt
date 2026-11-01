@@ -1,0 +1,5 @@
+# Install alongside requirements.txt. API intentionally does not require dbt/Parquet.
+fastapi>=0.115,<1
+uvicorn>=0.30,<1
+PyJWT>=2.10,<3
+argon2-cffi>=23,<27
